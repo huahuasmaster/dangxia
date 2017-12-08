@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tl="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="dangxia.com.ui.MainActivity">
+    <FrameLayout
+        android:id="@+id/fl_change"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_left"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="#eeeeee"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.flyco.tablayout.CommonTabLayout
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:id="@+id/bottom_left"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginBottom="0dp"
+        android:background="#ffffff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tl:tl_iconGravity="LEFT"
+        tl:tl_iconHeight="18dp"
+        tl:tl_iconMargin="0dp"
+        tl:tl_iconWidth="18dp"
+        tl:tl_indicator_bounce_enable="false"
+        tl:tl_indicator_color="#eeeeee"
+        tl:tl_indicator_height="0dp"
+        tl:tl_indicator_gravity="TOP"
+        tl:tl_textSelectColor="@color/colorPrimary"
+        tl:tl_textUnselectColor="#8a8a8a"
+        tl:tl_textsize="15sp"
+        tl:tl_underline_color="#FFF"
+        tl:tl_underline_gravity="TOP"
+        tl:tl_underline_height="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="0dp" />
+    <RelativeLayout
+        android:id="@+id/rl_click"
+        android:background="?attr/selectableItemBackground"
+        android:layout_width="wrap_content"
+        android:layout_height="55dip"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="4dp">
+
+        <ImageView
+            android:layout_width="45dip"
+            android:layout_height="45dip"
+            android:layout_centerInParent="true"
+            android:src="@mipmap/bg" />
+
+        <ImageView
+            android:id="@+id/iv_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@mipmap/add" />
+    </RelativeLayout>
+    <!--<View-->
+        <!--android:layout_width="56dp"-->
+        <!--android:layout_height="56dp"-->
+        <!--android:focusable="true"-->
+        <!--android:clickable="true"-->
+        <!--android:background="?attr/selectableItemBackground"-->
+        <!--android:id="@+id/bottom_middle"-->
+        <!--android:layout_marginBottom="1dp"-->
+        <!--app:layout_constraintLeft_toLeftOf="parent"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintRight_toRightOf="parent" />-->
+</android.support.constraint.ConstraintLayout>
