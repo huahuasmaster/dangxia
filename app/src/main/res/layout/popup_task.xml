@@ -1,0 +1,193 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#cc000000"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/trans_back"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/card_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="0dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginStart="0dp"
+        app:cardCornerRadius="0dp"
+        android:alpha="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="500dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="发布长期需求"
+                android:textColor="#000"
+                android:alpha="0.26"
+                app:layout_constraintTop_toTopOf="@+id/textView9"
+                app:layout_constraintStart_toStartOf="@+id/description_edit"
+                app:layout_constraintBottom_toBottomOf="@+id/textView9"
+                android:layout_marginBottom="0dp" />
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_location_on_pink_24dp"
+                app:layout_constraintTop_toTopOf="@+id/location_edit"
+                app:layout_constraintBottom_toBottomOf="@+id/location_edit"
+                app:layout_constraintEnd_toStartOf="@+id/location_edit"
+                android:layout_marginEnd="8dp" />
+
+            <EditText
+                android:id="@+id/location_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
+                android:alpha="0.56"
+                android:hint="请输入详细地址"
+                android:selectAllOnFocus="true"
+                android:background="@null"
+                android:text="XXX街道XX路6号519"
+                android:textColor="#000"
+                app:layout_constraintBottom_toTopOf="@+id/pop_rl_click"
+                app:layout_constraintEnd_toEndOf="parent" />
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toEndOf="@+id/description_edit"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="16dp"
+                android:checked="true"
+                android:id="@+id/audit_switch" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:text="审核接单者"
+                android:textColor="@color/colorAccent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBaseline_toBaselineOf="@+id/audit_switch"
+                app:layout_constraintEnd_toStartOf="@+id/audit_switch"
+                android:layout_marginEnd="0dp"
+                android:id="@+id/textView9" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="￥打赏:"
+                android:textSize="24sp"
+
+                app:layout_constraintStart_toStartOf="@+id/description_edit"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toTopOf="@+id/pop_rl_click"
+                android:id="@+id/textView2"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@+id/description_edit" />
+
+            <EditText
+                android:id="@+id/price_edit"
+                android:layout_width="128dp"
+                android:layout_height="64dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:background="@null"
+                android:inputType="number"
+                android:focusable="true"
+                android:selectAllOnFocus="true"
+                android:maxLines="1"
+                android:text="0"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="56sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/textView2"
+                android:layout_marginTop="0dp"
+                app:layout_constraintBottom_toBottomOf="@+id/textView2" />
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_editor_absoluteX="75dp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="56dp"
+                android:id="@+id/description_edit"
+                >
+                <EditText
+                    style="@style/Widget.AppCompat.EditText"
+                    android:id="@+id/description_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="请详细输入您的需求"
+                    android:selectAllOnFocus="true"
+                    android:gravity="top"
+                    android:lines="6"
+
+                    />
+            </android.support.design.widget.TextInputLayout>
+            
+            <!--<android.support.design.widget.TextInputLayout-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--app:layout_constraintStart_toStartOf="parent"-->
+                <!--android:layout_marginStart="32dp"-->
+                <!--android:layout_marginEnd="32dp"-->
+                <!--app:layout_constraintEnd_toEndOf="parent"-->
+                <!--android:layout_marginTop="16dp"-->
+                <!--app:layout_constraintTop_toBottomOf="@+id/description_edit">-->
+                <!--<EditText-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:gravity="top"-->
+                    <!--android:hint="请输入详细内容"-->
+                    <!--/>-->
+            <!--</android.support.design.widget.TextInputLayout>-->
+            <RelativeLayout
+                android:id="@+id/pop_rl_click"
+                android:layout_width="wrap_content"
+                android:layout_height="55dip"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <ImageView
+                    android:layout_width="45dip"
+                    android:layout_height="45dip"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/bg" />
+
+                <ImageView
+                    android:id="@+id/pop_iv_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    app:srcCompat="@mipmap/add" />
+            </RelativeLayout>
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v7.widget.CardView>
+
+</android.support.constraint.ConstraintLayout>
