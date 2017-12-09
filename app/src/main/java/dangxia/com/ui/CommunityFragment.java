@@ -1,5 +1,6 @@
 package dangxia.com.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -33,7 +34,7 @@ public class CommunityFragment extends Fragment{
     private View myTaskPage;
     private SearchView searchView;
     private String[] titles = {"已发布","待解决"};
-    private List<String> titleList = new ArrayList<>();
+    private List<String> titleList = Arrays.asList(titles);
     private List<View> viewList = new ArrayList<>();
 
     private static CommunityFragment fragment;
@@ -48,10 +49,11 @@ public class CommunityFragment extends Fragment{
         return fragment;
     }
 
+    @SuppressLint("InflateParams")
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_community,null);
+        @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.fragment_community, null);
         tabLayout = (SlidingTabLayout) v.findViewById(R.id.community_tab);
         viewPager = (ViewPager) v.findViewById(R.id.page);
         searchView = (SearchView) v.findViewById(R.id.searchView);
@@ -74,7 +76,6 @@ public class CommunityFragment extends Fragment{
         //填充数据源
         viewList.add(allTaskPage);
         viewList.add(myTaskPage);
-        titleList = Arrays.asList(titles);
 
         //设置适配器
         MyPagerAdapter adapter = new MyPagerAdapter(viewList);
@@ -98,7 +99,7 @@ public class CommunityFragment extends Fragment{
     class MyPagerAdapter extends PagerAdapter {
         private List<View> mViewList;
 
-        public MyPagerAdapter(List<View> mViewList) {
+        MyPagerAdapter(List<View> mViewList) {
             this.mViewList = mViewList;
         }
 

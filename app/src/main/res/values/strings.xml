@@ -3,4 +3,13 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="login">登录</string>
+    <string name="new_user_register">新用户注册</string>
+    <string name="forgot_pwd">忘记密码？</string>
+    <string name="password">密码</string>
+    <string name="phone_number">手机号</string>
+    <string name="back">回退</string>
+    <string name="verification_code">验证码</string>
+    <string name="register">注册</string>
+    <string name="send_vcode">发送验证码</string>
 </resources>
