@@ -1,6 +1,7 @@
 package dangxia.com.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,6 +62,7 @@ public class MsgChatItemAdapter extends RecyclerView.Adapter{
             msgHolder.headerImg.setImageResource(R.mipmap.doge);
         } else {
             msgHolder.headerImg.setImageResource(R.mipmap.doge2);
+            Log.i("123", "");
         }
     }
 
