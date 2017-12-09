@@ -24,6 +24,10 @@
 
 [虽然很不情愿但是讲道理还是要感谢的百度地图][8]
 
+[交互很不错的弹出菜单PopupWindowUtil][9]
+
+[聊天界面布局框架][10]
+
 
   [1]: https://github.com/JakeWharton/butterknife
   [2]: https://github.com/AItsuki/SwipeMenuRecyclerView
@@ -33,3 +37,5 @@
   [6]: https://github.com/afollestad/material-dialogs
   [7]: http://sms.mob.com/
   [8]: http://lbsyun.baidu.com/index.php?title=androidsdk
+  [9]: http://www.jianshu.com/p/65fe71f7f651
+  [10]: http://www.jianshu.com/p/4fc79094cc85
