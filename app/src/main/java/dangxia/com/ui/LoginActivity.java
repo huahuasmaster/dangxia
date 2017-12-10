@@ -1,9 +1,11 @@
 package dangxia.com.ui;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +17,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +29,12 @@ import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
 import cn.smssdk.gui.RegisterPage;
 import dangxia.com.R;
+import dangxia.com.dto.UserDto;
+import dangxia.com.utils.HttpCallbackListener;
+import dangxia.com.utils.HttpUtil;
+import dangxia.com.utils.UrlHandler;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -57,7 +67,44 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                final String phone = phoneEdit.getText().toString().trim();
+                final String password = pwdEdit.getText().toString().trim();
+                RequestBody body = new FormBody.Builder()
+                        .add("phone", phone)
+                        .add("password", password)
+                        .build();
+                String url = UrlHandler.getLoginUrl();
+                HttpUtil.getInstance().post(url, body, new HttpCallbackListener() {
+                    @Override
+                    public void onFinish(String response) {
+                        UserDto userDto = new Gson().fromJson(response, UserDto.class);
+                        if (userDto == null) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Snackbar.make(phoneEdit, "登录失败，请检查。", Snackbar.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            LoginActivity.this.getSharedPreferences("login_data", Context.MODE_PRIVATE)
+                                    .edit().putLong("phone", userDto.getPhone())
+                                    .putString("name", userDto.getName()).apply();
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        super.onError(e);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Snackbar.make(phoneEdit, "登录失败，请检查。", Snackbar.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
+
             }
         });
 

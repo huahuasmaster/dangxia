@@ -18,7 +18,7 @@
     <uses-permission android:name="android.permission.REAL_GET_TASKS" />
 
     <application
-        android:name="com.mob.MobApplication"
+        android:name="dangxia.com.application.ContextApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -36,7 +36,9 @@
             android:name="Mob-AppSecret"
             android:value="4d2956db63f4ca83bafafb748cd9cdc1" />
 
-        <activity android:name=".ui.MainActivity" />
+        <activity android:name=".ui.MainActivity"
+
+            />
         <activity
             android:name="com.mob.tools.MobUIShell"
             android:configChanges="keyboardHidden|orientation|screenSize"

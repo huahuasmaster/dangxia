@@ -1,5 +1,6 @@
 package dangxia.com.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,11 +10,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
 import dangxia.com.R;
+import dangxia.com.dto.UserDto;
+import dangxia.com.utils.HttpCallbackListener;
+import dangxia.com.utils.HttpUtil;
+import dangxia.com.utils.UrlHandler;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -36,6 +45,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     @BindView(R.id.back_btn)
     View backBtn;
+
+    private String phone;
+
+    private String vCode;
+
+    private String password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,11 +85,34 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         });
                     } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                         Log.i("1234", "验证成功！");
+                        final String phone = phoneEdit.getText().toString().trim();
+                        final String password = pwdEdit.getText().toString().trim();
+                        RegisterActivity.this.getSharedPreferences("login_data", Context.MODE_PRIVATE)
+                                .edit().putLong("phone", Long.parseLong(phone)).apply();
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(RegisterActivity.this, "验证成功！", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+                                Toast.makeText(RegisterActivity.this, "验证成功！注册中", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        String url = UrlHandler.getRegisterUrl();
+                        RequestBody body = new FormBody.Builder()
+                                .add("phone", phone)
+                                .add("password", password).build();
+                        HttpUtil.getInstance().post(url, body, new HttpCallbackListener() {
+                            @Override
+                            public void onFinish(String response) {
+                                final UserDto userDto = new Gson().fromJson(response, UserDto.class);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (userDto == null) {
+                                            Toast.makeText(RegisterActivity.this, "注册失败", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+                                        }
+                                    }
+                                });
                             }
                         });
                     }
@@ -95,7 +133,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View view) {
-        String phone = phoneEdit.getText().toString().trim();
+        phone = phoneEdit.getText().toString().trim();
         switch (view.getId()) {
             case R.id.send_vcode_btn:
                 if (phone.length() != 11) {
@@ -105,7 +143,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 }
                 break;
             case R.id.register_btn:
-                String vCode = vCodeEdit.getText().toString().trim();
+                vCode = vCodeEdit.getText().toString().trim();
                 SMSSDK.submitVerificationCode("86", phone, vCode);
                 break;
             case R.id.back_btn:
