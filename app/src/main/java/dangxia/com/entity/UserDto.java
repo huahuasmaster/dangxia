@@ -1,4 +1,4 @@
-package dangxia.com.dto;
+package dangxia.com.entity;
 
 public class UserDto {
 

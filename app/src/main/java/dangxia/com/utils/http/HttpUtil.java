@@ -1,4 +1,4 @@
-package dangxia.com.utils;
+package dangxia.com.utils.http;
 
 import android.content.Context;
 import android.content.SharedPreferences;

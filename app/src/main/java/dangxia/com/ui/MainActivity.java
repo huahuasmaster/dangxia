@@ -1,7 +1,6 @@
 package dangxia.com.ui;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -10,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -23,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dangxia.com.R;
-import dangxia.com.entity.QuickTaskBean;
 import dangxia.com.entity.TabEntity;
 import dangxia.com.view.PopupMenuUtil;
 
@@ -42,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
 
     private CommonTabLayout tab;
 
+//    public LocationClient mLocationClient;
+
     private ArrayList<CustomTabEntity> tabEntities = new ArrayList<>();
 
     private RelativeLayout rlClick;
@@ -56,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
 
         initTab();
 
+//        mLocationClient = new LocationClient(getApplicationContext());
+//        mLocationClient.registerLocationListener(new MyLocationListener());
+//        mLocationClient.start();
 
         //检查权限，动态申请未给予的权限
         List<String> permissionList = new ArrayList<>();

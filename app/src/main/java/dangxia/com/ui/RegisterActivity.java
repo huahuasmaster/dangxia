@@ -17,10 +17,10 @@ import butterknife.ButterKnife;
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
 import dangxia.com.R;
-import dangxia.com.dto.UserDto;
-import dangxia.com.utils.HttpCallbackListener;
-import dangxia.com.utils.HttpUtil;
-import dangxia.com.utils.UrlHandler;
+import dangxia.com.entity.UserDto;
+import dangxia.com.utils.http.HttpCallbackListener;
+import dangxia.com.utils.http.HttpUtil;
+import dangxia.com.utils.http.UrlHandler;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 

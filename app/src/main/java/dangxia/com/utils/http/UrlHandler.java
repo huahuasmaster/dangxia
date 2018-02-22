@@ -1,9 +1,7 @@
-package dangxia.com.utils;
+package dangxia.com.utils.http;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import java.util.Date;
 
 import dangxia.com.application.ContextApplication;
 
@@ -30,9 +28,25 @@ public class UrlHandler {
         return "http://" + getLoginIp() + ":" + loginPort + "/user/login";
     }
 
-    //注销url
-    public static String getLogoutUrl() {
-        return "http://" + getLoginIp() + ":" + loginPort + "/smart-sso-server/app/logout";
+    //获取附近所有任务
+    public static String getAllTask(double latitude, double longitude, double radius) {
+        return getHead() + "/task/" + latitude + "/" + longitude + "/" + radius + "/nearby";
+    }
+
+    //获取附近的快速任务
+    public static String getQuickTask(double latitude, double longitude, double radius) {
+        return getHead() + "/task/" + latitude + "/" + longitude + "/" + radius + "/nearbyQuick";
+
+    }
+
+    //获取自己领取的任务
+    public static String getMyTask() {
+        return getHead() + "/task/" + getUserId() + "/accepted";
+    }
+
+    //发布任务
+    public static String postTask() {
+        return getHead() + "/task/" + getUserId();
     }
 
     //注册
@@ -40,17 +54,7 @@ public class UrlHandler {
         return getHead() + "/user/register";
     }
 
-    //设备列表
-    public static String getDeviceList() {
-        return getHead() + "/device";
-    }
-
-    //请求设备上线
-    public static String getDeviceOnline() {
-        return getHead() + "/device";
-    }
-
-
+    //
     /**
      * 获取(除了登录接口)请求的开头ip与端口
      *
@@ -97,11 +101,11 @@ public class UrlHandler {
     }
 
     public static long getUserId() {
-        return loginSp.getLong("user_id", -1L);
+        return loginSp.getInt("user_id", -1);
     }
 
-    public static void setUserId(long userId) {
-        loginSp.edit().putLong("user_id", userId).apply();
+    public static void setUserId(int userId) {
+        loginSp.edit().putInt("user_id", userId).apply();
     }
 
 

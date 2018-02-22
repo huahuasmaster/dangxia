@@ -1,23 +1,24 @@
 package dangxia.com.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
@@ -30,14 +31,23 @@ import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.TextureMapView;
 import com.baidu.mapapi.model.LatLng;
 import com.github.library.bubbleview.BubbleTextView;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import dangxia.com.R;
-import dangxia.com.entity.QuickTaskBean;
+import dangxia.com.entity.TaskDto;
+import dangxia.com.utils.http.HttpCallbackListener;
+import dangxia.com.utils.http.HttpUtil;
+import dangxia.com.utils.http.UrlHandler;
+import dangxia.com.utils.location.DistanceUtil;
+import dangxia.com.utils.location.LocationUtil;
 import dangxia.com.view.PopupMenuUtil;
 
 /**
@@ -59,10 +69,12 @@ public class QuickFragment extends Fragment{
 
     public LocationClient mLocationClient;
 
+    private FloatingActionButton fab;
 
-    private List<QuickTaskBean> taskBeans = new ArrayList<>();
 
-    private Map<Marker,QuickTaskBean> map = new HashMap<>();
+    private List<TaskDto> taskBeans = new ArrayList<>();
+
+    private Map<Marker, TaskDto> map = new HashMap<>();
     private boolean isFirstLocate = true;
 
     private CardView bottomLabel;
@@ -85,6 +97,8 @@ public class QuickFragment extends Fragment{
         mapView = (TextureMapView) v.findViewById(R.id.bmapView);
         bottomLabel = (CardView) v.findViewById(R.id.bottom_label);
         closeBtn = (ImageView) v.findViewById(R.id.close_btn);
+        fab = (FloatingActionButton) v.findViewById(R.id.refresh_fab);
+        mapView.showZoomControls(false);
         baiduMap = mapView.getMap();
         baiduMap.setMyLocationEnabled(true);
         baiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
@@ -94,13 +108,33 @@ public class QuickFragment extends Fragment{
         setLocationRefresh();
         initLables();
         baiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public boolean onMarkerClick(Marker marker) {
-                QuickTaskBean taskBean = map.get(marker);
+                TaskDto taskBean = map.get(marker);
                 if(taskBean != null ) {
 //                    Toast.makeText(getContext(),
 //                            "点击了"+taskBean.getContent(),Toast.LENGTH_SHORT).show();
                     bottomLabel.setVisibility(View.VISIBLE);
+                    //设置内容
+                    ((TextView) bottomLabel.findViewById(R.id.label_content)
+                    ).setText(taskBean.getContent());
+                    //设置价格
+                    ((TextView) bottomLabel.findViewById(R.id.label_price)
+                    ).setText("￥" + taskBean.getPrice());
+                    //设置距离
+                    ((TextView) bottomLabel.findViewById(R.id.label_distance)
+                    ).setText(DistanceUtil.km(LocationUtil.getInstance().getLatitude(),
+                            LocationUtil.getInstance().getLongitude(),
+                            taskBean.getLatitude(), taskBean.getLongitude()) + "km");
+                    //设置姓名
+                    ((TextView) bottomLabel.findViewById(R.id.label_name)
+                    ).setText(taskBean.getPublisherName());
+                    //设置电话
+//                    ((TextView)bottomLabel.findViewById(R.id.label_phone)
+//                    ).setText(taskBean.getContent());
+                    fab.setVisibility(View.INVISIBLE);
+
                 }
                 return false;
             }
@@ -109,6 +143,7 @@ public class QuickFragment extends Fragment{
             @Override
             public void onClick(View view) {
                 bottomLabel.setVisibility(View.INVISIBLE);
+                fab.setVisibility(View.VISIBLE);
             }
         });
         bottomLabel.setOnClickListener(new View.OnClickListener() {
@@ -118,6 +153,12 @@ public class QuickFragment extends Fragment{
             }
         });
         locationSp = getActivity().getSharedPreferences("location_sp", Context.MODE_PRIVATE);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initLables();
+            }
+        });
         return v;
     }
 
@@ -125,8 +166,10 @@ public class QuickFragment extends Fragment{
         mLocationClient.stop();
         mLocationClient.start();
         setLocationRefresh();
-        navigateTo(31.248493,120.608842);
+        navigateTo(LocationUtil.getInstance().getLatitude(), LocationUtil.getInstance().getLongitude());
+
         initLables();
+
     }
 
     /**
@@ -134,18 +177,21 @@ public class QuickFragment extends Fragment{
      */
     private void initLables() {
         baiduMap.clear();
-        // TODO: 2017/11/20 将测试数据替换为网络请求
-        taskBeans.add(new QuickTaskBean(1,1,100.0f,"求王者带飞","",
-                31.248493,120.608842));
-        taskBeans.add(new QuickTaskBean(2,1,5.0f,"来个人唠嗑","",
-                31.249493,120.608942));
-        for(QuickTaskBean taskBean : taskBeans) {
-            addMarker(taskBean);
-        }
+        HttpUtil.getInstance().get(UrlHandler.getQuickTask(LocationUtil.getInstance().getLatitude(),
+                LocationUtil.getInstance().getLongitude(), 10), new HttpCallbackListener() {
+            @Override
+            public void onFinish(String response) {
+                taskBeans = new Gson().fromJson(response, new TypeToken<List<TaskDto>>() {
+                }.getType());
+                for (TaskDto dto : taskBeans) {
+                    addMarker(dto);
+                }
+            }
+        });
     }
 
-    private void addMarker(QuickTaskBean taskBean) {
-        LatLng point = new LatLng(taskBean.getLatitude(),taskBean.getLongtitude());
+    private void addMarker(TaskDto taskBean) {
+        LatLng point = new LatLng(taskBean.getLatitude(), taskBean.getLongitude());
         BubbleTextView textView = (BubbleTextView) LayoutInflater
                 .from(getContext()).inflate(R.layout.new_label,null);
         textView.setText("￥"+taskBean.getPrice()+" "+taskBean.getContent());
@@ -217,8 +263,10 @@ public class QuickFragment extends Fragment{
             if (bdLocation.getLocType() == BDLocation.TypeGpsLocation
                     || bdLocation.getLocType() == BDLocation.TypeNetWorkLocation) {
                 //将地图定位至当前位置
-                locationSp.edit().putString("latitude",""+bdLocation.getLatitude()).apply();
-                locationSp.edit().putString("longitude",""+bdLocation.getLongitude()).apply();
+//                locationSp.edit().putString("latitude",""+bdLocation.getLatitude()).apply();
+//                locationSp.edit().putString("longitude",""+bdLocation.getLongitude()).apply();
+//                LocationUtil.getInstance().setLatitude(31.248493);
+//                LocationUtil.getInstance().setLongitude(120.608842);
                 StringBuilder simplePositon = new StringBuilder();
                 simplePositon.append(bdLocation.getStreet())
                         .append(bdLocation.getStreetNumber());
@@ -230,7 +278,7 @@ public class QuickFragment extends Fragment{
 
                 }
 //                Toast.makeText(getContext(),simplePositon.toString(),Toast.LENGTH_LONG).show();
-                navigateTo(31.248493,120.608842);
+                navigateTo(LocationUtil.getInstance().getLatitude(), LocationUtil.getInstance().getLongitude());
 //                navigateTo(bdLocation.getLatitude(),bdLocation.getLongitude());
             }
         }

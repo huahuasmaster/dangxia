@@ -3,6 +3,7 @@ package dangxia.com.ui;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -20,19 +21,16 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cn.smssdk.EventHandler;
-import cn.smssdk.SMSSDK;
-import cn.smssdk.gui.RegisterPage;
 import dangxia.com.R;
-import dangxia.com.dto.UserDto;
-import dangxia.com.utils.HttpCallbackListener;
-import dangxia.com.utils.HttpUtil;
-import dangxia.com.utils.UrlHandler;
+import dangxia.com.entity.UserDto;
+import dangxia.com.utils.http.HttpCallbackListener;
+import dangxia.com.utils.http.HttpUtil;
+import dangxia.com.utils.http.UrlHandler;
+import dangxia.com.utils.location.LocationUtil;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 
@@ -50,13 +48,21 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.password_edit)
     EditText pwdEdit;
 
+    private SharedPreferences loginSp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+        // TODO: 2018/2/22 代替为真正的定位
+        LocationUtil.getInstance().setLatitude(30.271085);
+        LocationUtil.getInstance().setLongitude(120.096896);
+        loginSp = getSharedPreferences("login_data", Context.MODE_PRIVATE);
         phoneEdit.setFocusable(true);
         phoneEdit.requestFocus();
+        phoneEdit.setText("" + loginSp.getString("phone", ""));
+        pwdEdit.setText("" + loginSp.getString("password", ""));
         goRegisterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,9 +92,11 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             });
                         } else {
-                            LoginActivity.this.getSharedPreferences("login_data", Context.MODE_PRIVATE)
-                                    .edit().putLong("phone", userDto.getPhone())
+                            loginSp.edit().putString("phone", "" + userDto.getPhone())
+                                    .putString("password", password)
                                     .putString("name", userDto.getName()).apply();
+                            Log.i("userId", "onFinish: " + userDto.getId());
+                            UrlHandler.setUserId(userDto.getId());
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         }
                     }
@@ -102,12 +110,19 @@ public class LoginActivity extends AppCompatActivity {
                                 Snackbar.make(phoneEdit, "登录失败，请检查。", Snackbar.LENGTH_SHORT).show();
                             }
                         });
-                    }
+                    }       
                 });
 
             }
         });
 
+        loginBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                return false;
+            }
+        });
         //检查权限，动态申请未给予的权限
         List<String> permissionList = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

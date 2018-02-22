@@ -1,6 +1,7 @@
 package dangxia.com.view;
 
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.design.widget.Snackbar;
@@ -8,6 +9,7 @@ import android.support.v7.widget.CardView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,10 +22,19 @@ import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import dangxia.com.R;
+import dangxia.com.ui.CommunityFragment;
+import dangxia.com.ui.QuickFragment;
+import dangxia.com.utils.http.HttpCallbackListener;
+import dangxia.com.utils.http.HttpUtil;
+import dangxia.com.utils.http.UrlHandler;
+import dangxia.com.utils.location.LocationUtil;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
 
 
 /**
@@ -57,6 +68,7 @@ public class PopupMenuUtil {
     private EditText locationEdit;
     private Switch auditSwitch;
     private boolean allowSend = false;
+    private boolean isQuick = false;
     //    private LinearLayout llTest1, llTest2, llTest3, llTest4, llTest5, llTest6, llTest7, llTest8;
     private CardView cardView;
 
@@ -92,9 +104,12 @@ public class PopupMenuUtil {
      * @param context context
      */
     private void _createView(final Context context) {
-        if(type.equals(QUICK_TASK)) {
+        //判断发布哪种需求
+        if (type.equals(QUICK_TASK)) {
+            isQuick = true;
             rootView = LayoutInflater.from(context).inflate(R.layout.popup_quick_task, null);
-        } else if(type.equals(COMMON_TASK)) {
+        } else if (type.equals(COMMON_TASK)) {
+            isQuick = false;
             rootView = LayoutInflater.from(context).inflate(R.layout.popup_task, null);
         }
 
@@ -167,8 +182,8 @@ public class PopupMenuUtil {
         desEdit.requestFocus();
         desEdit.addTextChangedListener(textWatcher);
         locationEdit.setText(
-                context.getSharedPreferences("location_sp",Context.MODE_PRIVATE)
-                .getString("location","")
+                context.getSharedPreferences("location_sp", Context.MODE_PRIVATE)
+                        .getString("location", "")
         );
         transBack.setOnClickListener(new MViewClick(0, context));
 //        llTest1 = (LinearLayout) rootView.findViewById(R.id.test1);
@@ -185,27 +200,67 @@ public class PopupMenuUtil {
                     @Override
                     public void onClick(View view) {
                         //如果允许发送
-                        if(allowSend) {
-                            new Timer().schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    final Snackbar snackbar = Snackbar
-                                            .make(showOnView,"发送"+type+"成功!",Snackbar.LENGTH_SHORT);
-                                    FrameLayout.LayoutParams  params =
-                                            (FrameLayout.LayoutParams) snackbar.getView().getLayoutParams();
-                                    params.setMargins(0,0,0,dip2px(context,56f));
-                                    snackbar.getView().setLayoutParams(params);
-                                    snackbar.setAction("撤销", new View.OnClickListener() {
+                        if (allowSend) {
+//                            new Timer().schedule(new TimerTask() {
+//                                @Override
+//                                public void run() {
+//                                    final Snackbar snackbar = Snackbar
+//                                            .make(showOnView,"发送"+type+"成功!",Snackbar.LENGTH_SHORT);
+//                                    FrameLayout.LayoutParams  params =
+//                                            (FrameLayout.LayoutParams) snackbar.getView().getLayoutParams();
+//                                    params.setMargins(0,0,0,dip2px(context,56f));
+//                                    snackbar.getView().setLayoutParams(params);
+//                                    snackbar.setAction("撤销", new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View view) {
+//                                            snackbar.dismiss();
+//                                        }
+//                                    });
+//                                    snackbar.show();
+//                                }
+//                            },300);
+                            RequestBody body = new FormBody.Builder()
+                                    .add("type", isQuick ? "0" : "1")
+                                    .add("publishDate", "" + new Date().getTime())
+                                    .add("endDate", "" + (new Date().getTime() + 2880000))
+                                    .add("content", desEdit.getText().toString())
+                                    .add("requireVerify", auditSwitch.isChecked() ? "1" : "0")
+                                    .add("location", locationEdit.getText().toString())
+                                    .add("latitude", "" + LocationUtil.getInstance().getLatitude())
+                                    .add("longitude", "" + LocationUtil.getInstance().getLongitude())
+                                    .add("price", priceEdit.getText().toString())
+                                    .build();
+                            Log.i(TAG, "onClick: " + body.toString());
+                            HttpUtil.getInstance().post(UrlHandler.postTask(), body,
+                                    new HttpCallbackListener() {
                                         @Override
-                                        public void onClick(View view) {
-                                            snackbar.dismiss();
+                                        public void onFinish(String response) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Toast.makeText(context, "发布成功", Toast.LENGTH_SHORT)
+                                                            .show();
+                                                }
+                                            });
+
                                         }
                                     });
-                                    snackbar.show();
-                                }
-                            },300);
                         }
-                        new MViewClick(0,context).onClick(view);
+                        //关闭弹窗
+                        new MViewClick(0, context).onClick(view);
+                        new Timer().schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                if (isQuick) {
+                                    Log.i(TAG, "onClick: 刷新quick");
+                                    QuickFragment.newInstance().reRun();
+                                } else {
+                                    Log.i(TAG, "onClick: 刷新community");
+                                    CommunityFragment.newInstance().refreshAllTask();
+                                }
+                            }
+                        }, 500);
+
 
                     }
                 });
@@ -331,9 +386,9 @@ public class PopupMenuUtil {
     }
 
     public void refreshLocation(String location) {
-        if(locationEdit !=null && !popupWindow.isShowing()) {
+        if (locationEdit != null && !popupWindow.isShowing()) {
             locationEdit.setText(location);
-        } 
+        }
     }
 
     /**
@@ -343,10 +398,10 @@ public class PopupMenuUtil {
      * @param parent  parent
      */
     public void _show(Context context, View parent) {
-        _show(context,parent,QUICK_TASK);
+        _show(context, parent, QUICK_TASK);
     }
 
-    public void _show(Context context,View parent,String type) {
+    public void _show(Context context, View parent, String type) {
         this.type = type;
         _createView(context);
         if (popupWindow != null && !popupWindow.isShowing()) {
@@ -354,6 +409,7 @@ public class PopupMenuUtil {
             _openPopupWindowAction();
         }
     }
+
     /**
      * 关闭popupWindow
      */
