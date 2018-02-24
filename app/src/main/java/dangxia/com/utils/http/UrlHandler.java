@@ -54,7 +54,10 @@ public class UrlHandler {
         return getHead() + "/user/register";
     }
 
-    //
+    //获取与自己有关的消息
+    public static String getConversationAboutMe() {
+        return getHead() + "/conversation/" + getUserId() + "/list";
+    }
     /**
      * 获取(除了登录接口)请求的开头ip与端口
      *
@@ -66,7 +69,8 @@ public class UrlHandler {
 
     //获取服务器ip
     public static String getIp() {
-        return loginSp.getString("ip", "192.168.43.31");
+        return loginSp.getString("ip", "192.168.1.13");
+//        return loginSp.getString("ip", "192.168.43.31");
     }
 
     //设置服务器ip
@@ -76,7 +80,8 @@ public class UrlHandler {
 
     //获取登录ip
     public static String getLoginIp() {
-        return loginSp.getString("login_ip", "192.168.43.31");
+        return loginSp.getString("login_ip", "192.168.1.13");
+//        return loginSp.getString("login_ip", "192.168.43.31");
     }
 
     //设置登录ip

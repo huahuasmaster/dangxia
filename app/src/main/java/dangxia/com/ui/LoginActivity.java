@@ -1,6 +1,7 @@
 package dangxia.com.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +20,8 @@ import android.widget.Toast;
 
 
 import com.google.gson.Gson;
+
+import org.litepal.tablemanager.Connector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +53,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private SharedPreferences loginSp;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +63,11 @@ public class LoginActivity extends AppCompatActivity {
         LocationUtil.getInstance().setLatitude(30.271085);
         LocationUtil.getInstance().setLongitude(120.096896);
         loginSp = getSharedPreferences("login_data", Context.MODE_PRIVATE);
+        if (loginSp.getBoolean("first", true)) {
+            Connector.getDatabase();
+            Toast.makeText(this, "创建数据库成功", Toast.LENGTH_SHORT).show();
+            loginSp.edit().putBoolean("first", false).apply();
+        }
         phoneEdit.setFocusable(true);
         phoneEdit.requestFocus();
         phoneEdit.setText("" + loginSp.getString("phone", ""));
@@ -110,7 +119,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Snackbar.make(phoneEdit, "登录失败，请检查。", Snackbar.LENGTH_SHORT).show();
                             }
                         });
-                    }       
+                    }
                 });
 
             }

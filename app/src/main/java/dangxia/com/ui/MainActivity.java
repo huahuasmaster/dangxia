@@ -29,13 +29,13 @@ public class MainActivity extends AppCompatActivity {
     //左边的两个页面
     private ArrayList<Fragment> fragments = new ArrayList<>();
     //页面的标题
-    private String[] titles = {"圈子","火速","","消息","我的"};
+    private String[] titles = {"圈子", "火速", "", "消息", "我的"};
 
     //左边页面的两套图标
-    private int[] unselectedIcons = {R.mipmap.community,R.mipmap.quick,R.mipmap.quick,
-            R.mipmap.message,R.mipmap.mine};
-    private int[] selectedIcons = {R.mipmap.community_selected,R.mipmap.quick_selected,R.mipmap.quick_selected,
-            R.mipmap.message_selected,R.mipmap.mine_selected};
+    private int[] unselectedIcons = {R.mipmap.community, R.mipmap.quick, R.mipmap.quick,
+            R.mipmap.message, R.mipmap.mine};
+    private int[] selectedIcons = {R.mipmap.community_selected, R.mipmap.quick_selected, R.mipmap.quick_selected,
+            R.mipmap.message_selected, R.mipmap.mine_selected};
 
     private CommonTabLayout tab;
 
@@ -76,13 +76,9 @@ public class MainActivity extends AppCompatActivity {
         } else {
             initRl();
         }
-
-
-
-
     }
 
-    private void initTab(){
+    private void initTab() {
         //装填fragment
         fragments.add(CommunityFragment.newInstance());
         fragments.add(QuickFragment.newInstance());
@@ -91,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         fragments.add(MineFragment.newInstance());
 
         //装填底部tab数据源
-        for(int i = 0;i < titles.length;i++) {
+        for (int i = 0; i < titles.length; i++) {
             tabEntities.add(new TabEntity(titles[i],
                     selectedIcons[i],
                     unselectedIcons[i]));
@@ -100,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         //初始化tabLayout,设置图标大小与字体大小
         tab = (CommonTabLayout) findViewById(R.id.bottom_left);
 
-        tab.setTabData(tabEntities,this,R.id.fl_change, fragments);
+        tab.setTabData(tabEntities, this, R.id.fl_change, fragments);
         tab.setIconGravity(Gravity.TOP);
         tab.setTextsize(12.0F);
         tab.setIconHeight(25.0F);
@@ -109,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
 //        tab.setCurrentTab(1);
 
     }
+
     private void initRl() {
         ivImage = (ImageView) findViewById(R.id.iv_img);
         rlClick = (RelativeLayout) findViewById(R.id.rl_click);
@@ -116,10 +113,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 PopupMenuUtil.setShowOnView(ivImage);
-                if(tab.getCurrentTab() > 0) {
+                if (tab.getCurrentTab() > 0) {
                     PopupMenuUtil.getInstance()._show(MainActivity.this, ivImage);
                 } else {
-                    PopupMenuUtil.getInstance()._show(MainActivity.this, ivImage,PopupMenuUtil.COMMON_TASK);
+                    PopupMenuUtil.getInstance()._show(MainActivity.this, ivImage, PopupMenuUtil.COMMON_TASK);
                 }
             }
         });

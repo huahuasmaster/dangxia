@@ -204,7 +204,6 @@ public class CommunityFragment extends Fragment {
                 @Override
                 public void run() {
                     swipeAllTask.setRefreshing(true);
-
                 }
             });
         }

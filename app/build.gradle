@@ -49,6 +49,7 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.afollestad.material-dialogs:core:0.9.4.5'
     compile 'com.jude:easyrecyclerview:4.2.3'
+    compile 'org.litepal.android:core:1.6.1'
     compile 'com.jakewharton:butterknife:8.2.1'
     apt 'com.jakewharton:butterknife-compiler:8.2.1'
     compile 'org.greenrobot:eventbus:3.0.0'
