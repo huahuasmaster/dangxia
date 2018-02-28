@@ -1,10 +1,9 @@
 package dangxia.com.entity;
 
-import org.litepal.crud.DataSupport;
-
+import java.io.Serializable;
 import java.util.Date;
 
-public class MessageDto extends DataSupport {
+public class MessageDto implements Serializable {
 
     private int id;
 
@@ -12,9 +11,8 @@ public class MessageDto extends DataSupport {
 
     private String date;
 
-    private int senderId;
+    private int sender; //0->订单所有者、1->申请接单者
 
-    private int receiverId;
 
     private int type;//0->文字消息（默认）、1->语音消息、2->图片消息
 
@@ -44,21 +42,14 @@ public class MessageDto extends DataSupport {
         this.date = date;
     }
 
-    public int getSenderId() {
-        return senderId;
+    public int getSender() {
+        return sender;
     }
 
-    public void setSenderId(int senderId) {
-        this.senderId = senderId;
+    public void setSender(int senderId) {
+        this.sender = senderId;
     }
 
-    public int getReceiverId() {
-        return receiverId;
-    }
-
-    public void setReceiverId(int receiverId) {
-        this.receiverId = receiverId;
-    }
 
     public int getType() {
         return type;
@@ -82,8 +73,7 @@ public class MessageDto extends DataSupport {
                 "id=" + id +
                 ", content='" + content + '\'' +
                 ", date='" + date + '\'' +
-                ", senderId=" + senderId +
-                ", receiverId=" + receiverId +
+                ", senderId=" + sender +
                 ", type=" + type +
                 ", status=" + status +
                 '}';

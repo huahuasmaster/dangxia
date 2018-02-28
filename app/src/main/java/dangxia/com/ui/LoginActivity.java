@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.gson.Gson;
 
 import org.litepal.tablemanager.Connector;
@@ -52,6 +53,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText pwdEdit;
 
     private SharedPreferences loginSp;
+    private MaterialDialog waitDialog;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -68,6 +70,12 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, "创建数据库成功", Toast.LENGTH_SHORT).show();
             loginSp.edit().putBoolean("first", false).apply();
         }
+        waitDialog = new MaterialDialog.Builder(this)
+                .title("登录中……")
+                .content("请稍后")
+                .progress(true, 0)
+                .progressIndeterminateStyle(false)
+                .build();
         phoneEdit.setFocusable(true);
         phoneEdit.requestFocus();
         phoneEdit.setText("" + loginSp.getString("phone", ""));
@@ -84,6 +92,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 final String phone = phoneEdit.getText().toString().trim();
                 final String password = pwdEdit.getText().toString().trim();
+                waitDialog.show();
                 RequestBody body = new FormBody.Builder()
                         .add("phone", phone)
                         .add("password", password)
@@ -106,6 +115,9 @@ public class LoginActivity extends AppCompatActivity {
                                     .putString("name", userDto.getName()).apply();
                             Log.i("userId", "onFinish: " + userDto.getId());
                             UrlHandler.setUserId(userDto.getId());
+                            if (waitDialog.isShowing()) {
+                                waitDialog.cancel();
+                            }
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         }
                     }
@@ -116,6 +128,9 @@ public class LoginActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                if (waitDialog.isShowing()) {
+                                    waitDialog.cancel();
+                                }
                                 Snackbar.make(phoneEdit, "登录失败，请检查。", Snackbar.LENGTH_SHORT).show();
                             }
                         });

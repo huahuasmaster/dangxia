@@ -80,7 +80,8 @@ public class MessageFragment extends Fragment{
             @Override
             public void onMain(int position) {
                 Intent intent = new Intent(getContext(), ChatActivity.class);
-                intent.putExtra("conversation_id", adapter.getDtos().get(position).getId());
+                intent.putExtra("con_id", adapter.getDtos().get(position).getId());
+                intent.putExtra("con", adapter.getDtos().get(position));
                 getActivity().startActivity(intent);
             }
         };

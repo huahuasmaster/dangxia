@@ -12,34 +12,31 @@ import com.github.library.bubbleview.BubbleTextView;
 import java.util.List;
 
 import dangxia.com.R;
-import dangxia.com.entity.MessageBean;
+import dangxia.com.entity.MessageDto;
+import dangxia.com.utils.http.UrlHandler;
 import de.hdodenhof.circleimageview.CircleImageView;
-
-/**
- * Created by zhuang_ge on 2017/11/26.
- */
 
 public class MsgChatItemAdapter extends RecyclerView.Adapter{
 
-    private List<MessageBean> msgList;
+    private List<MessageDto> msgList;
 
-    public List<MessageBean> getMsgList() {
+    public List<MessageDto> getMsgList() {
         return msgList;
     }
 
-    public void setMsgList(List<MessageBean> msgList) {
+    public void setMsgList(List<MessageDto> msgList) {
         this.msgList = msgList;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = null;
+        View v;
         switch (viewType) {
-            case MessageBean.TYPE_ACCEPT :
+            case 1:
                 v = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.item_chat_accept,parent,false);
                 return new MsgHolder(v);
-            case MessageBean.TYPE_SEND :
+            case 0:
                 v = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.item_chat_send,parent,false);
                 return new MsgHolder(v);
@@ -51,14 +48,14 @@ public class MsgChatItemAdapter extends RecyclerView.Adapter{
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         MsgHolder msgHolder = (MsgHolder)holder;
-        MessageBean bean = msgList.get(position);
+        MessageDto bean = msgList.get(position);
         //填充信息内容
         msgHolder.contentTxt.setText(bean.getContent());
         //填充时间
-        msgHolder.dateTxt.setText(bean.getTime());
+        msgHolder.dateTxt.setText(bean.getDate());
         //填充头像
         // TODO: 2017/11/26 动态适配头像
-        if(bean.getType() == MessageBean.TYPE_SEND) {
+        if (bean.getSender() == 2) {
             msgHolder.headerImg.setImageResource(R.mipmap.doge);
         } else {
             msgHolder.headerImg.setImageResource(R.mipmap.doge2);
@@ -73,7 +70,11 @@ public class MsgChatItemAdapter extends RecyclerView.Adapter{
 
     @Override
     public int getItemViewType(int position) {
-        return msgList.get(position).getType();
+        if (msgList.get(position).getSender() == UrlHandler.getUserId()) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 
     private class MsgHolder extends RecyclerView.ViewHolder {
@@ -81,7 +82,7 @@ public class MsgChatItemAdapter extends RecyclerView.Adapter{
         BubbleTextView contentTxt;
         CircleImageView headerImg;
 
-        public MsgHolder(View itemView) {
+        MsgHolder(View itemView) {
             super(itemView);
 
             dateTxt = (TextView) itemView.findViewById(R.id.chat_item_date);

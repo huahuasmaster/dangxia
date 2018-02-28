@@ -33,9 +33,6 @@ import dangxia.com.utils.http.HttpUtil;
 import dangxia.com.utils.http.UrlHandler;
 import dangxia.com.utils.location.LocationUtil;
 
-/**
- * Created by zhuang_ge on 2017/11/17.
- */
 
 public class CommunityFragment extends Fragment {
 
@@ -116,9 +113,9 @@ public class CommunityFragment extends Fragment {
             }
 
             @Override
-            public void onMain(int taskId) {
+            public void onMain(TaskDto taskDto) {
                 Intent intent = new Intent(getContext(), TaskDetailActivity.class);
-                intent.putExtra("taskId", taskId);
+                intent.putExtra("task_dto", taskDto);
                 getActivity().startActivity(intent);
             }
         };

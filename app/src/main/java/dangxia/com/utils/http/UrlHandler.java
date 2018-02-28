@@ -28,6 +28,8 @@ public class UrlHandler {
         return "http://" + getLoginIp() + ":" + loginPort + "/user/login";
     }
 
+    //根据id获取某个任务的详细信息
+
     //获取附近所有任务
     public static String getAllTask(double latitude, double longitude, double radius) {
         return getHead() + "/task/" + latitude + "/" + longitude + "/" + radius + "/nearby";
@@ -57,6 +59,30 @@ public class UrlHandler {
     //获取与自己有关的消息
     public static String getConversationAboutMe() {
         return getHead() + "/conversation/" + getUserId() + "/list";
+    }
+
+    //接单
+    public static String takeOrder() {
+        return getHead() + "/order";
+    }
+
+    public static String getCon(int id) {
+        return getHead() + "/conversation/" + id;
+    }
+
+    //发出申请（会话）
+    public static String initConversation(int taskId) {
+        return getHead() + "/conversation/" + getUserId() + "/" + taskId;
+    }
+
+    //发送消息
+    public static String pushMsg(int conId) {
+        return getHead() + "/conversation/" + conId + "/push";
+    }
+
+    //获取会话中的聊天记录
+    public static String getMsgList(int conId) {
+        return getHead() + "/conversation/" + conId + "/msglist";
     }
     /**
      * 获取(除了登录接口)请求的开头ip与端口
@@ -105,7 +131,7 @@ public class UrlHandler {
         UrlHandler.loginPort = loginPort;
     }
 
-    public static long getUserId() {
+    public static int getUserId() {
         return loginSp.getInt("user_id", -1);
     }
 

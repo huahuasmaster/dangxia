@@ -1,10 +1,11 @@
 package dangxia.com.entity;
 
+import java.io.Serializable;
 
-public class ConversationDto {
+public class ConversationDto implements Serializable {
     private int id;
 
-    private int taskId;
+    private TaskDto task;
 
     private int initiatorId;
 
@@ -26,12 +27,12 @@ public class ConversationDto {
         this.id = id;
     }
 
-    public int getTaskId() {
-        return taskId;
+    public TaskDto getTask() {
+        return task;
     }
 
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
+    public void setTask(TaskDto task) {
+        this.task = task;
     }
 
     public int getInitiatorId() {
@@ -86,7 +87,7 @@ public class ConversationDto {
     public String toString() {
         return "ConversationDto{" +
                 "id=" + id +
-                ", taskId=" + taskId +
+                ", task=" + task +
                 ", initiatorId=" + initiatorId +
                 ", initiatorName='" + initiatorName + '\'' +
                 ", publisherName='" + publisherName + '\'' +

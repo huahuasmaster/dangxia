@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
 import dangxia.com.R;
 import dangxia.com.adapter.listener.TaskItemCallBackListener;
 import dangxia.com.entity.TaskDto;
+import dangxia.com.utils.http.UrlHandler;
 import dangxia.com.utils.location.DistanceUtil;
 import dangxia.com.utils.location.LocationUtil;
 
@@ -60,12 +61,13 @@ public class TaskItemAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int i) {
         MyHolder myHolder = (MyHolder) viewHolder;
-        TaskDto dto = taskDtos.get(i);
+        final TaskDto dto = taskDtos.get(i);
         myHolder.content.setText(dto.getContent());
         myHolder.distance.setText("" + DistanceUtil.km(dto.getLatitude(), dto.getLongitude(),
                 LocationUtil.getInstance().getLatitude(), LocationUtil.getInstance().getLongitude()) + "km");
         // TODO: 2018/2/21 为头像新增点击事件
-        myHolder.icon.setImageResource(R.mipmap.doge);
+        myHolder.icon.setImageResource(UrlHandler.getUserId() == 2 ?
+                R.mipmap.doge : R.mipmap.doge2);
         myHolder.icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,7 +80,7 @@ public class TaskItemAdapter extends RecyclerView.Adapter {
         myHolder.wholeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onMain(i);
+                listener.onMain(dto);
             }
         });
 

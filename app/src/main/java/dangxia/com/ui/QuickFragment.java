@@ -22,6 +22,7 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.Marker;
@@ -111,7 +112,7 @@ public class QuickFragment extends Fragment{
             @SuppressLint("SetTextI18n")
             @Override
             public boolean onMarkerClick(Marker marker) {
-                TaskDto taskBean = map.get(marker);
+                final TaskDto taskBean = map.get(marker);
                 if(taskBean != null ) {
 //                    Toast.makeText(getContext(),
 //                            "点击了"+taskBean.getContent(),Toast.LENGTH_SHORT).show();
@@ -134,6 +135,14 @@ public class QuickFragment extends Fragment{
 //                    ((TextView)bottomLabel.findViewById(R.id.label_phone)
 //                    ).setText(taskBean.getContent());
                     fab.setVisibility(View.INVISIBLE);
+                    bottomLabel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(getContext(), TaskDetailActivity.class);
+                            intent.putExtra("task_dto", taskBean);
+                            startActivity(intent);
+                        }
+                    });
 
                 }
                 return false;
@@ -146,12 +155,7 @@ public class QuickFragment extends Fragment{
                 fab.setVisibility(View.VISIBLE);
             }
         });
-        bottomLabel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getContext(),TaskDetailActivity.class));
-            }
-        });
+
         locationSp = getActivity().getSharedPreferences("location_sp", Context.MODE_PRIVATE);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

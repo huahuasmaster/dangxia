@@ -37,7 +37,7 @@
             android:value="4d2956db63f4ca83bafafb748cd9cdc1" />
 
         <activity android:name=".ui.MainActivity"
-
+            android:screenOrientation="portrait"
             />
         <activity
             android:name="com.mob.tools.MobUIShell"

@@ -31,8 +31,10 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:clickable="true"
+                android:focusable="true"
                 android:id="@+id/back_btn"
-                android:background="?attr/selectableItemBackground"
+                android:background="@drawable/circle_back"
+                android:foreground="?attr/selectableItemBackground"
                 />
             <ImageView
                 android:layout_width="24dp"
@@ -80,6 +82,7 @@
                     android:layout_marginStart="8dp"
                     android:alpha="0.78"
                     android:text="doge先生"
+                    android:id="@+id/name_detail"
                     android:textColor="#000"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -99,6 +102,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="￥999"
+                android:id="@+id/price_detail"
                 android:textColor="@android:color/holo_red_light"
                 android:textStyle="bold"
                 android:textSize="22sp"
@@ -111,6 +115,7 @@
                 android:textColor="#000"
                 android:padding="8dp"
                 android:alpha="0.78"
+                android:id="@+id/content_detail"
                 android:textSize="18sp"
                 android:text="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                 />
