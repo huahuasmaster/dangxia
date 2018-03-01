@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -225,6 +226,7 @@ public class QuickFragment extends Fragment{
         if (isFirstLocate) {
 //            Toast.makeText(getContext(), "nav to 纬度" + latitude + " 经度" + longitude, Toast.LENGTH_SHORT).show();
             LatLng ll = new LatLng(latitude, longitude);
+            Log.i("quickFragemnt", "onReceiveLocation: 地图的位置移动到：" + ll.toString());
             MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
             baiduMap.animateMapStatus(update);
             update = MapStatusUpdateFactory.zoomTo(19f);

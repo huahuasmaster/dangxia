@@ -11,6 +11,11 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        manifestPlaceholders = [
+
+                XG_ACCESS_ID : "2100277760",
+                XG_ACCESS_KEY: "A3TV63A32YFI",
+        ]
     }
     buildTypes {
         release {
@@ -55,6 +60,10 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.github.LichFaker:Logger:v1.0.0'
     compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.tencent.xinge:xinge:3.2.2-release'
+    compile 'com.tencent.wup:wup:1.0.0.E-release'
+    compile 'com.tencent.mid:mid:4.0.6-release'
+
     compile 'com.squareup.okhttp3:okhttp:3.8.1'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.android.support:support-vector-drawable:25.3.1'

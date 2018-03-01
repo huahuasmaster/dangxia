@@ -1,12 +1,14 @@
 package dangxia.com.ui;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,6 +24,7 @@ import java.util.List;
 
 import dangxia.com.R;
 import dangxia.com.entity.TabEntity;
+import dangxia.com.utils.location.LocationUtil;
 import dangxia.com.view.PopupMenuUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -164,5 +167,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == 0x13) {
+            double newLatitude = data.getDoubleExtra("latitude", LocationUtil.getInstance().getLatitude());
+            double newLongitude = data.getDoubleExtra("longitude", LocationUtil.getInstance().getLongitude());
+            PopupMenuUtil.getInstance().refreshLocation(newLatitude, newLongitude);
+            Log.i("main", "onRequestPermissionsResult: 接收到了新坐标，开始通知弹窗刷新" + newLatitude + "," + newLongitude);
 
+        }
+    }
 }

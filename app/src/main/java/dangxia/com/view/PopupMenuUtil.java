@@ -3,6 +3,7 @@ package dangxia.com.view;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
@@ -28,6 +29,7 @@ import java.util.TimerTask;
 
 import dangxia.com.R;
 import dangxia.com.ui.CommunityFragment;
+import dangxia.com.ui.LocChooseActivity;
 import dangxia.com.ui.QuickFragment;
 import dangxia.com.utils.http.HttpCallbackListener;
 import dangxia.com.utils.http.HttpUtil;
@@ -48,7 +50,7 @@ public class PopupMenuUtil {
     public static final String QUICK_TASK = "快速需求";
     public static final String COMMON_TASK = "长期需求";
     private String type;
-
+    public static final int REQUEST_FOR_LOC = 0x12;
     public static PopupMenuUtil getInstance() {
         return MenuUtilHolder.INSTANCE;
     }
@@ -67,8 +69,11 @@ public class PopupMenuUtil {
     private EditText desEdit;
     private EditText locationEdit;
     private Switch auditSwitch;
+    private ImageView goChooseLoc;
     private boolean allowSend = false;
     private boolean isQuick = false;
+    private double tarLatitude;
+    private double tarLongitude;
     //    private LinearLayout llTest1, llTest2, llTest3, llTest4, llTest5, llTest6, llTest7, llTest8;
     private CardView cardView;
 
@@ -169,6 +174,8 @@ public class PopupMenuUtil {
      * 初始化 view
      */
     private void initLayout(final Context context) {
+        tarLatitude = LocationUtil.getInstance().getLatitude();
+        tarLongitude = LocationUtil.getInstance().getLongitude();
         rlClick = (RelativeLayout) rootView.findViewById(R.id.pop_rl_click);
         ivBtn = (ImageView) rootView.findViewById(R.id.pop_iv_img);
         cardView = (CardView) rootView.findViewById(R.id.card_back);
@@ -177,6 +184,14 @@ public class PopupMenuUtil {
         priceEdit = (EditText) rootView.findViewById(R.id.price_edit);
         auditSwitch = (Switch) rootView.findViewById(R.id.audit_switch);
         locationEdit = (EditText) rootView.findViewById(R.id.location_edit);
+        goChooseLoc = (ImageView) rootView.findViewById(R.id.go_choose_loc);
+        goChooseLoc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, LocChooseActivity.class);
+                ((Activity) context).startActivityForResult(intent, REQUEST_FOR_LOC);
+            }
+        });
         priceEdit.addTextChangedListener(textWatcher);
         desEdit.setFocusable(true);
         desEdit.requestFocus();
@@ -226,11 +241,12 @@ public class PopupMenuUtil {
                                     .add("content", desEdit.getText().toString())
                                     .add("requireVerify", auditSwitch.isChecked() ? "1" : "0")
                                     .add("location", locationEdit.getText().toString())
-                                    .add("latitude", "" + LocationUtil.getInstance().getLatitude())
-                                    .add("longitude", "" + LocationUtil.getInstance().getLongitude())
+                                    .add("latitude", "" + tarLatitude)
+                                    .add("longitude", "" + tarLongitude)
                                     .add("price", priceEdit.getText().toString())
                                     .build();
-                            Log.i(TAG, "onClick: " + body.toString());
+
+                            Log.i(TAG, "onClick: " + tarLatitude + "," + tarLongitude);
                             HttpUtil.getInstance().post(UrlHandler.postTask(), body,
                                     new HttpCallbackListener() {
                                         @Override
@@ -389,6 +405,11 @@ public class PopupMenuUtil {
         if (locationEdit != null && !popupWindow.isShowing()) {
             locationEdit.setText(location);
         }
+    }
+
+    public void refreshLocation(double latitude, double longitude) {
+        tarLongitude = longitude;
+        tarLatitude = latitude;
     }
 
     /**
