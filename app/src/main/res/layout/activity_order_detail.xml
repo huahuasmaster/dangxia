@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <android.support.constraint.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="dangxia.com.ui.OrderDetailActivity">
@@ -31,6 +35,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:clickable="true"
+            android:focusable="true"
             android:id="@+id/back_btn"
             android:background="?attr/selectableItemBackground"
             />
@@ -42,7 +47,7 @@
             android:layout_gravity="center_vertical"
             />
         <TextView
-            android:id="@+id/chat_name"
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -74,6 +79,7 @@
                     android:textSize="16sp"
                     />
                 <TextView
+                    android:id="@+id/content_order"
                     android:layout_marginLeft="16dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -93,6 +99,7 @@
                     android:textSize="16sp"
                     />
                 <TextView
+                    android:id="@+id/price_order"
                     android:layout_marginLeft="16dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -112,6 +119,7 @@
                     android:textSize="16sp"
                     />
                 <TextView
+                    android:id="@+id/add_order"
                     android:layout_marginLeft="16dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -131,6 +139,7 @@
                     android:textSize="16sp"
                     />
                 <TextView
+                    android:id="@+id/date_order"
                     android:layout_marginLeft="16dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -150,6 +159,7 @@
                     android:textSize="16sp"
                     />
                 <TextView
+                    android:id="@+id/executor_order"
                     android:layout_marginLeft="16dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -160,14 +170,17 @@
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
+
+    </android.support.constraint.ConstraintLayout>
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
         android:id="@+id/fab"
         app:fabSize="normal"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_check_white_24dp" />
-</android.support.constraint.ConstraintLayout>
+        app:srcCompat="@drawable/ic_check_white_24dp"
+        tools:ignore="RtlHardcoded" />
+</android.support.design.widget.CoordinatorLayout>

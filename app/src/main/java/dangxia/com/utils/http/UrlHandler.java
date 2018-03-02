@@ -66,6 +66,10 @@ public class UrlHandler {
         return getHead() + "/order";
     }
 
+    public static String getOrderByTask(int taskId) {
+        return getHead() + "/order/" + taskId + "/byTask";
+    }
+
     public static String getCon(int id) {
         return getHead() + "/conversation/" + id;
     }
@@ -83,6 +87,10 @@ public class UrlHandler {
     //获取会话中的聊天记录
     public static String getMsgList(int conId) {
         return getHead() + "/conversation/" + conId + "/msglist";
+    }
+
+    public static String finishOrder(int id) {
+        return getHead() + "/order/" + id;
     }
     /**
      * 获取(除了登录接口)请求的开头ip与端口

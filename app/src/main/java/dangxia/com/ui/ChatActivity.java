@@ -108,9 +108,50 @@ public class ChatActivity extends AppCompatActivity {
             confirmBtn.setOnClickListener(checkOrder);
         } else if (!owner) {
             confirmBtn.setVisibility(View.INVISIBLE);
+        } else {
+            confirmBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View view) {
+                    RequestBody body = new FormBody.Builder()
+                            .add("senderId", String.valueOf(mConversation.getInitiatorId()))
+                            .add("taskId", String.valueOf(mConversation.getTask().getId()))
+                            .build();
+                    HttpUtil.getInstance().post(UrlHandler.takeOrder(), body, new HttpCallbackListener() {
+                        @Override
+                        public void onFinish(String response) {
+                            if (response.equals("" + mConversation.getId())) {
+
+                                final Snackbar snackbar = Snackbar.make(confirmBtn,
+                                        "您的需求已被成功接单！", Snackbar.LENGTH_SHORT);
+                                snackbar.setAction("查看订单", checkOrder);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        snackbar.show();
+                                    }
+                                });
+                                ordered = true;
+                                confirmBtn.setText("查看订单");
+                                confirmBtn.setOnClickListener(checkOrder);
+                            }
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            super.onError(e);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(ChatActivity.this, "确认失败，请稍后再试", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    });
+
+                }
+            });
         }
         initMsgData();
-
 
 
         sendBtn.setOnClickListener(new View.OnClickListener() {
@@ -138,36 +179,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        confirmBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                RequestBody body = new FormBody.Builder()
-                        .add("senderId", String.valueOf(mConversation.getInitiatorId()))
-                        .add("taskId", String.valueOf(mConversation.getTask().getId()))
-                        .build();
-                HttpUtil.getInstance().post(UrlHandler.takeOrder(), body, new HttpCallbackListener() {
-                    @Override
-                    public void onFinish(String response) {
-                        if (response.equals("" + mConversation.getId())) {
 
-                            final Snackbar snackbar = Snackbar.make(confirmBtn,
-                                    "您的需求已被成功接单！", Snackbar.LENGTH_SHORT);
-                            snackbar.setAction("查看订单", checkOrder);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    snackbar.show();
-                                }
-                            });
-                            ordered = true;
-                            confirmBtn.setText("查看订单");
-                            confirmBtn.setOnClickListener(checkOrder);
-                        }
-                    }
-                });
-
-            }
-        });
     }
 
     private void initMsgData() {
