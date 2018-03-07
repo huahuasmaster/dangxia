@@ -284,6 +284,7 @@ public class QuickFragment extends Fragment{
 
                 }
 //                Toast.makeText(getContext(),simplePositon.toString(),Toast.LENGTH_LONG).show();
+                // TODO: 2018/3/7  
                 navigateTo(LocationUtil.getInstance().getLatitude(), LocationUtil.getInstance().getLongitude());
 //                navigateTo(bdLocation.getLatitude(),bdLocation.getLongitude());
             }

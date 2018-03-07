@@ -61,7 +61,7 @@ public class LocChooseActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent();
                 intent.putExtra("latitude", targetLatitude);
-                intent.putExtra("longtitude", targetLongtitude);
+                intent.putExtra("longitude", targetLongtitude);
                 Log.i(TAG, "onClick: 返回了新坐标:" + targetLatitude + "," + targetLongtitude);
                 setResult(0x13, intent);
                 finish();

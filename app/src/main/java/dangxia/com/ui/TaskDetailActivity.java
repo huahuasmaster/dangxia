@@ -62,6 +62,9 @@ public class TaskDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "此任务已过时。", Toast.LENGTH_SHORT).show();
             finish();
         }
+        if (mTask.getPublisher() == UrlHandler.getUserId()) {
+            orderTakeBtn.setEnabled(false);
+        }
         findViewById(R.id.back_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

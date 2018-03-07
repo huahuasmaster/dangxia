@@ -62,8 +62,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
         // TODO: 2018/2/22 代替为真正的定位
-        LocationUtil.getInstance().setLatitude(30.271085);
-        LocationUtil.getInstance().setLongitude(120.096896);
+        LocationUtil.getInstance().setLatitude(30.294993);
+        LocationUtil.getInstance().setLongitude(120.144198);
         loginSp = getSharedPreferences("login_data", Context.MODE_PRIVATE);
         if (loginSp.getBoolean("first", true)) {
             Connector.getDatabase();

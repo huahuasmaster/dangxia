@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.baidu.mapapi.SDKInitializer;
 import com.flyco.tablayout.CommonTabLayout;
 import com.flyco.tablayout.listener.CustomTabEntity;
+import com.meizu.cloud.pushsdk.PushManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
         } else {
             initRl();
         }
+
+        PushManager.register(this, "112482",
+                "641577bbb5d04a71800dcc66ade1d5f6");
     }
 
     private void initTab() {

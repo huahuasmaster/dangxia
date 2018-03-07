@@ -103,8 +103,8 @@ public class UrlHandler {
 
     //获取服务器ip
     public static String getIp() {
-        return loginSp.getString("ip", "192.168.1.13");
 //        return loginSp.getString("ip", "192.168.43.31");
+        return loginSp.getString("ip", "192.168.1.132");
     }
 
     //设置服务器ip
@@ -114,7 +114,7 @@ public class UrlHandler {
 
     //获取登录ip
     public static String getLoginIp() {
-        return loginSp.getString("login_ip", "192.168.1.13");
+        return loginSp.getString("login_ip", "192.168.1.132");
 //        return loginSp.getString("login_ip", "192.168.43.31");
     }
 

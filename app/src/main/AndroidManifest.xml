@@ -66,8 +66,24 @@
         </activity>
         <activity
             android:name=".ui.RegisterActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize"></activity>
-        <activity android:name=".ui.LocChooseActivity"></activity>
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity android:name=".ui.LocChooseActivity" />
+        <!-- push应用定义消息receiver声明 -->
+        <receiver android:name="dangxia.com.receiver.MsgReceiver">
+            <intent-filter>
+                <!-- 接收push消息 -->
+                <action android:name="com.meizu.flyme.push.intent.MESSAGE" />
+                <!-- 接收register消息 -->
+                <action android:name="com.meizu.flyme.push.intent.REGISTER.FEEDBACK" />
+                <!-- 接收unregister消息-->
+                <action android:name="com.meizu.flyme.push.intent.UNREGISTER.FEEDBACK" />
+                <!-- 兼容低版本Flyme3推送服务配置 -->
+                <action android:name="com.meizu.c2dm.intent.REGISTRATION" />
+                <action android:name="com.meizu.c2dm.intent.RECEIVE" />
+
+                <category android:name="dangxia.com.receiver" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
