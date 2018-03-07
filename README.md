@@ -31,7 +31,7 @@
 [聊天界面布局框架][11]
 
 
-  [1]: https://github.com/huahuasmaster/dangxia/blob/master/app/imgs/Screenshot_20180307-122956__01.jpg "Screenshot_20180307-122956__01"
+  [1]: https://github.com/huahuasmaster/dangxia/blob/master/app/imgs/Screenshot_20180307-122956__0.jpg "Screenshot_20180307-122956__01"
   [2]: https://github.com/JakeWharton/butterknife
   [3]: https://github.com/AItsuki/SwipeMenuRecyclerView
   [4]: https://github.com/lguipeng/BubbleView
