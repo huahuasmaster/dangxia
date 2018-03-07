@@ -128,11 +128,11 @@ public class ChatActivity extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         snackbar.show();
+                                        ordered = true;
+                                        confirmBtn.setText("查看订单");
+                                        confirmBtn.setOnClickListener(checkOrder);
                                     }
                                 });
-                                ordered = true;
-                                confirmBtn.setText("查看订单");
-                                confirmBtn.setOnClickListener(checkOrder);
                             }
                         }
 
