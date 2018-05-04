@@ -135,6 +135,10 @@ public class OrderDetailActivity extends AppCompatActivity {
                             executorName.setText(orderDto.getExecutorName());
                             date.setText(orderDto.getOrderDate());
                             add.setText(orderDto.getTaskDto().getLocation());
+                            if (orderDto.getExecutorId() == UrlHandler.getUserId()) {
+                                //如果自己是执行者，那么将无法使用完成按钮
+                                fab.setVisibility(View.GONE);
+                            }
                             if (orderDto.getStatus() > 0) {
                                 fab.setVisibility(View.INVISIBLE);
                                 title.setText("订单详情（已完成）");

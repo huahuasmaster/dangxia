@@ -103,6 +103,7 @@ public class ChatActivity extends AppCompatActivity {
         name.setText(owner ?
                 mConversation.getInitiatorName() : mConversation.getPublisherName());
         conId = mConversation.getId();
+        taskDetail.setText(mConversation.getTask().getContent());
         if (ordered) {
             confirmBtn.setText("查看订单");
             confirmBtn.setOnClickListener(checkOrder);

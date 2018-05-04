@@ -135,7 +135,13 @@ public class MainActivity extends AppCompatActivity {
         if (PopupMenuUtil.getInstance()._isShowing()) {
             PopupMenuUtil.getInstance()._rlClickAction();
         } else {
-            super.onBackPressed();
+            Intent i = new Intent(Intent.ACTION_MAIN);
+
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            i.addCategory(Intent.CATEGORY_HOME);
+
+            startActivity(i);
         }
     }
 

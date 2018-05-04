@@ -79,6 +79,15 @@
                 app:layout_constraintEnd_toEndOf="@+id/description_edit"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <Button
+                android:id="@+id/choose_class_btn"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="无类别"
+                app:layout_constraintBottom_toBottomOf="@+id/location_edit"
+                app:layout_constraintStart_toStartOf="@+id/description_edit"
+                app:layout_constraintTop_toTopOf="@+id/location_edit" />
             <TextView
                 android:id="@+id/textView9"
                 android:layout_width="wrap_content"

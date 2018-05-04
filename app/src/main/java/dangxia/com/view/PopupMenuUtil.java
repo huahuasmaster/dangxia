@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.text.Editable;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -23,11 +25,18 @@ import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import dangxia.com.R;
+import dangxia.com.application.ContextApplication;
+import dangxia.com.entity.TaskClassDto;
 import dangxia.com.ui.CommunityFragment;
 import dangxia.com.ui.LocChooseActivity;
 import dangxia.com.ui.QuickFragment;
@@ -49,8 +58,12 @@ public class PopupMenuUtil {
 
     public static final String QUICK_TASK = "快速需求";
     public static final String COMMON_TASK = "长期需求";
+
+    private List<TaskClassDto> classDtoList;
+    private int taskClassId = -1;
     private String type;
     public static final int REQUEST_FOR_LOC = 0x12;
+
     public static PopupMenuUtil getInstance() {
         return MenuUtilHolder.INSTANCE;
     }
@@ -70,10 +83,12 @@ public class PopupMenuUtil {
     private EditText locationEdit;
     private Switch auditSwitch;
     private ImageView goChooseLoc;
+    private Button chooseClassBtn;
     private boolean allowSend = false;
     private boolean isQuick = false;
     private double tarLatitude;
     private double tarLongitude;
+    private MaterialDialog chooseClassesDialog;
     //    private LinearLayout llTest1, llTest2, llTest3, llTest4, llTest5, llTest6, llTest7, llTest8;
     private CardView cardView;
 
@@ -176,6 +191,7 @@ public class PopupMenuUtil {
     private void initLayout(final Context context) {
         tarLatitude = LocationUtil.getInstance().getLatitude();
         tarLongitude = LocationUtil.getInstance().getLongitude();
+        chooseClassBtn = (Button) rootView.findViewById(R.id.choose_class_btn);
         rlClick = (RelativeLayout) rootView.findViewById(R.id.pop_rl_click);
         ivBtn = (ImageView) rootView.findViewById(R.id.pop_iv_img);
         cardView = (CardView) rootView.findViewById(R.id.card_back);
@@ -201,6 +217,47 @@ public class PopupMenuUtil {
                         .getString("location", "")
         );
         transBack.setOnClickListener(new MViewClick(0, context));
+
+        if (classDtoList == null) {
+            HttpUtil.getInstance().get(UrlHandler.getTaskClasses(),
+                    new HttpCallbackListener() {
+                        @Override
+                        public void onFinish(final String response) {
+
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    classDtoList = new Gson()
+                                            .fromJson(response, new TypeToken<List<TaskClassDto>>() {
+                                            }.getType());
+                                    String[] classes = new String[classDtoList.size()];
+                                    for (int i = 0; i < classes.length; i++) {
+                                        classes[i] = classDtoList.get(i).getName();
+                                    }
+                                    chooseClassesDialog = new MaterialDialog.Builder(rootView.getContext())
+                                            .title("请选择需求类型")
+                                            .cancelable(false)
+                                            .items(classes)
+                                            .itemsCallback(new MaterialDialog.ListCallback() {
+                                                @Override
+                                                public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
+                                                    taskClassId = position;
+                                                    afterChoose(text.toString());
+                                                }
+                                            })
+                                            .build();
+                                    chooseClassBtn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            chooseClassesDialog.show();
+                                        }
+                                    });
+                                }
+                            });
+
+                        }
+                    });
+        }
 //        llTest1 = (LinearLayout) rootView.findViewById(R.id.test1);
 //        llTest2 = (LinearLayout) rootView.findViewById(R.id.test2);
 //        llTest3 = (LinearLayout) rootView.findViewById(R.id.test3);
@@ -290,6 +347,19 @@ public class PopupMenuUtil {
 //        llTest7.setOnClickListener(new MViewClick(7, context));
 //        llTest8.setOnClickListener(new MViewClick(8, context));
 
+    }
+
+    private void afterChoose(String taskClass) {
+        int id = -1;
+        for (TaskClassDto d : classDtoList) {
+            if (d.getName().equals(taskClass)) {
+                id = d.getId();
+                break;
+            }
+        }
+        Log.i(TAG, "afterChoose: classId=" + id);
+        chooseClassBtn.setText(taskClass);
+        //todo 提交关键词和任务类别 查询价格
     }
 
     /**

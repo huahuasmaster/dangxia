@@ -66,7 +66,7 @@ public class TaskItemAdapter extends RecyclerView.Adapter {
         myHolder.distance.setText("" + DistanceUtil.km(dto.getLatitude(), dto.getLongitude(),
                 LocationUtil.getInstance().getLatitude(), LocationUtil.getInstance().getLongitude()) + "km");
         // TODO: 2018/2/21 为头像新增点击事件
-        myHolder.icon.setImageResource(UrlHandler.getUserId() == 2 ?
+        myHolder.icon.setImageResource(dto.getPublisher() == 2 ?
                 R.mipmap.doge : R.mipmap.doge2);
         myHolder.icon.setOnClickListener(new View.OnClickListener() {
             @Override

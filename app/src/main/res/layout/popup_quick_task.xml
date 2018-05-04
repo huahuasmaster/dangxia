@@ -54,6 +54,15 @@
                 app:layout_constraintTop_toTopOf="@+id/location_edit"
                 app:srcCompat="@drawable/ic_location_on_pink_24dp" />
 
+            <Button
+                android:id="@+id/choose_class_btn"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="无类别"
+                app:layout_constraintBottom_toBottomOf="@+id/location_edit"
+                app:layout_constraintStart_toStartOf="@+id/description_edit"
+                app:layout_constraintTop_toTopOf="@+id/location_edit" />
             <EditText
                 android:id="@+id/location_edit"
                 android:layout_width="wrap_content"

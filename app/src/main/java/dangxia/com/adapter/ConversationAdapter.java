@@ -53,7 +53,14 @@ public class ConversationAdapter extends RecyclerView.Adapter {
         MyHolder myHolder = (MyHolder) holder;
         myHolder.content.setText(dto.getLastWords());
         myHolder.date.setText(dto.getLastDate());
-        myHolder.icon.setImageResource(R.mipmap.doge2);
+        int iconId;
+        // TODO: 2018/4/6 转化成真正的头像加载 
+        if (UrlHandler.getUserId() == 2) {
+            iconId = R.mipmap.doge2;
+        } else {
+            iconId = R.mipmap.doge;
+        }
+        myHolder.icon.setImageResource(iconId);
         myHolder.title.setText(dto.getInitiatorId() == UrlHandler.getUserId() ?
                 dto.getPublisherName() : dto.getInitiatorName() + "(申请接单)");
         myHolder.wholeView.setOnClickListener(new View.OnClickListener() {
