@@ -18,7 +18,7 @@ public class UrlHandler {
     private static String loginPort = "8081";
     private static String port = "8081";
     private static final String cloudIp = "140.143.225.154";
-    private static final String localIp = "192.168.1.196";
+    private static final String localIp = "192.168.1.102";
     private static final boolean onCloud = false;
 
 
@@ -62,6 +62,11 @@ public class UrlHandler {
     //获取与自己有关的消息
     public static String getConversationAboutMe() {
         return getHead() + "/conversation/" + getUserId() + "/list";
+    }
+
+    //查询预估价格
+    public static String getPriceEvaluation() {
+        return getHead() + "/task/evaluation";
     }
 
     //接单

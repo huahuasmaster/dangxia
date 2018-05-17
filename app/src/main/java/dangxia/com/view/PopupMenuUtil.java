@@ -5,8 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Looper;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -17,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -35,7 +32,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import dangxia.com.R;
-import dangxia.com.application.ContextApplication;
+import dangxia.com.entity.PriceSection;
 import dangxia.com.entity.TaskClassDto;
 import dangxia.com.ui.CommunityFragment;
 import dangxia.com.ui.LocChooseActivity;
@@ -59,10 +56,11 @@ public class PopupMenuUtil {
     public static final String QUICK_TASK = "快速需求";
     public static final String COMMON_TASK = "长期需求";
 
-    private List<TaskClassDto> classDtoList;
+    private static List<TaskClassDto> classDtoList;
     private int taskClassId = -1;
     private String type;
     public static final int REQUEST_FOR_LOC = 0x12;
+    private static String[] classes;
 
     public static PopupMenuUtil getInstance() {
         return MenuUtilHolder.INSTANCE;
@@ -84,11 +82,17 @@ public class PopupMenuUtil {
     private Switch auditSwitch;
     private ImageView goChooseLoc;
     private Button chooseClassBtn;
-    private boolean allowSend = false;
-    private boolean isQuick = false;
+    private boolean allowSend = false;//允许发送
+    private boolean isQuick = false;//是否为快速需求
+    private boolean classChoosed = false;//已经选择过大类
+    private boolean priceNoticed = false;//提醒过价格
+    private boolean chooseNoticed = false;//提醒过去选择分类
     private double tarLatitude;
     private double tarLongitude;
     private MaterialDialog chooseClassesDialog;
+    private MaterialDialog PriceDialog;
+    private MaterialDialog noticeChooseDialog;
+    private PriceSection priceSection;
     //    private LinearLayout llTest1, llTest2, llTest3, llTest4, llTest5, llTest6, llTest7, llTest8;
     private CardView cardView;
 
@@ -201,12 +205,9 @@ public class PopupMenuUtil {
         auditSwitch = (Switch) rootView.findViewById(R.id.audit_switch);
         locationEdit = (EditText) rootView.findViewById(R.id.location_edit);
         goChooseLoc = (ImageView) rootView.findViewById(R.id.go_choose_loc);
-        goChooseLoc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(context, LocChooseActivity.class);
-                ((Activity) context).startActivityForResult(intent, REQUEST_FOR_LOC);
-            }
+        goChooseLoc.setOnClickListener(view -> {
+            Intent intent = new Intent(context, LocChooseActivity.class);
+            ((Activity) context).startActivityForResult(intent, REQUEST_FOR_LOC);
         });
         priceEdit.addTextChangedListener(textWatcher);
         desEdit.setFocusable(true);
@@ -218,46 +219,70 @@ public class PopupMenuUtil {
         );
         transBack.setOnClickListener(new MViewClick(0, context));
 
-        if (classDtoList == null) {
+        chooseClassesDialog = new MaterialDialog.Builder(rootView.getContext())
+                .title("请选择需求类型")
+                .cancelable(false)
+                .items(new String[]{"无类别"})
+                .itemsCallback((dialog, itemView, position, text) -> {
+                    taskClassId = position;
+                    afterChoose(text.toString());
+                })
+                .build();
+        if (classDtoList != null) {
+            chooseClassesDialog.setItems(classes);
+        }
+        noticeChooseDialog = new MaterialDialog.Builder(rootView.getContext())
+                .title("请选择类别")
+                .cancelable(true)
+                .content("选择类别之后可以帮您预估价格")
+                .positiveText("好的").build();
+        PriceDialog = new MaterialDialog.Builder(rootView.getContext())
+                .title("价格预估")
+                .cancelable(false)
+                .positiveText("直接填入")
+                .negativeText("我自己来")
+                .onPositive((dialog, which) -> {
+                    if (priceSection != null) {
+                        priceEdit.setText("" + ((priceSection.getMax() + priceSection.getMin()) / 2));
+                    }
+                })
+                .build();
+        chooseClassBtn.setOnClickListener(view -> chooseClassesDialog.show());
+        if (classDtoList == null) { //对大类列表进行初始化
             HttpUtil.getInstance().get(UrlHandler.getTaskClasses(),
                     new HttpCallbackListener() {
                         @Override
                         public void onFinish(final String response) {
 
-                            ((Activity) context).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    classDtoList = new Gson()
-                                            .fromJson(response, new TypeToken<List<TaskClassDto>>() {
-                                            }.getType());
-                                    String[] classes = new String[classDtoList.size()];
-                                    for (int i = 0; i < classes.length; i++) {
-                                        classes[i] = classDtoList.get(i).getName();
-                                    }
-                                    chooseClassesDialog = new MaterialDialog.Builder(rootView.getContext())
-                                            .title("请选择需求类型")
-                                            .cancelable(false)
-                                            .items(classes)
-                                            .itemsCallback(new MaterialDialog.ListCallback() {
-                                                @Override
-                                                public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
-                                                    taskClassId = position;
-                                                    afterChoose(text.toString());
-                                                }
-                                            })
-                                            .build();
-                                    chooseClassBtn.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            chooseClassesDialog.show();
-                                        }
-                                    });
-                                }
-                            });
+                            classDtoList = new Gson()
+                                    .fromJson(response, new TypeToken<List<TaskClassDto>>() {
+                                    }.getType());
+                            classes = new String[classDtoList.size()];
+                            for (int i = 0; i < classes.length; i++) {
+                                classes[i] = classDtoList.get(i).getName();
+                            }
+                            chooseClassesDialog.setItems(classes);
 
                         }
                     });
+
         }
+
+
+        priceEdit.setOnFocusChangeListener((view, b) -> {
+            if (!b) return;
+            if (priceNoticed) return;
+            //最正常的情况->弹出价格提醒弹窗
+            if (classChoosed && priceSection != null) {
+                PriceDialog.show();
+                priceNoticed = true;
+            }
+            //用户未选择分类则提醒选择分类
+            if (!classChoosed && !chooseNoticed) {
+                noticeChooseDialog.show();
+                chooseNoticed = true;
+            }
+        });
 //        llTest1 = (LinearLayout) rootView.findViewById(R.id.test1);
 //        llTest2 = (LinearLayout) rootView.findViewById(R.id.test2);
 //        llTest3 = (LinearLayout) rootView.findViewById(R.id.test3);
@@ -268,11 +293,9 @@ public class PopupMenuUtil {
 //        llTest8 = (LinearLayout) rootView.findViewById(R.id.test8);
 
         rlClick.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        //如果允许发送
-                        if (allowSend) {
+                view -> {
+                    //如果允许发送
+                    if (allowSend) {
 //                            new Timer().schedule(new TimerTask() {
 //                                @Override
 //                                public void run() {
@@ -291,51 +314,46 @@ public class PopupMenuUtil {
 //                                    snackbar.show();
 //                                }
 //                            },300);
-                            RequestBody body = new FormBody.Builder()
-                                    .add("type", isQuick ? "0" : "1")
-                                    .add("publishDate", "" + new Date().getTime())
-                                    .add("endDate", "" + (new Date().getTime() + 2880000))
-                                    .add("content", desEdit.getText().toString())
-                                    .add("requireVerify", auditSwitch.isChecked() ? "1" : "0")
-                                    .add("location", locationEdit.getText().toString())
-                                    .add("latitude", "" + tarLatitude)
-                                    .add("longitude", "" + tarLongitude)
-                                    .add("price", priceEdit.getText().toString())
-                                    .build();
+                        RequestBody body = new FormBody.Builder()
+                                .add("type", isQuick ? "0" : "1")
+                                .add("publishDate", "" + new Date().getTime())
+                                .add("endDate", "" + (new Date().getTime() + 2880000))
+                                .add("content", desEdit.getText().toString())
+                                .add("requireVerify", auditSwitch.isChecked() ? "1" : "0")
+                                .add("location", locationEdit.getText().toString())
+                                .add("latitude", "" + tarLatitude)
+                                .add("longitude", "" + tarLongitude)
+                                .add("price", priceEdit.getText().toString())
+                                .build();
 
-                            Log.i(TAG, "onClick: " + tarLatitude + "," + tarLongitude);
-                            HttpUtil.getInstance().post(UrlHandler.postTask(), body,
-                                    new HttpCallbackListener() {
-                                        @Override
-                                        public void onFinish(String response) {
-                                            ((Activity) context).runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    Toast.makeText(context, "发布成功", Toast.LENGTH_SHORT)
-                                                            .show();
-                                                }
-                                            });
+                        Log.i(TAG, "onClick: " + tarLatitude + "," + tarLongitude);
+                        HttpUtil.getInstance().post(UrlHandler.postTask(), body,
+                                new HttpCallbackListener() {
+                                    @Override
+                                    public void onFinish(String response) {
+                                        ((Activity) context).runOnUiThread(() ->
+                                                Toast.makeText(context, "发布成功", Toast.LENGTH_SHORT)
+                                                        .show());
 
-                                        }
-                                    });
-                        }
-                        //关闭弹窗
-                        new MViewClick(0, context).onClick(view);
-                        new Timer().schedule(new TimerTask() {
-                            @Override
-                            public void run() {
-                                if (isQuick) {
-                                    Log.i(TAG, "onClick: 刷新quick");
-                                    QuickFragment.newInstance().reRun();
-                                } else {
-                                    Log.i(TAG, "onClick: 刷新community");
-                                    CommunityFragment.newInstance().refreshAllTask();
-                                }
-                            }
-                        }, 500);
-
-
+                                    }
+                                });
                     }
+                    //关闭弹窗
+                    new MViewClick(0, context).onClick(view);
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            if (isQuick) {
+                                Log.i(TAG, "onClick: 刷新quick");
+                                QuickFragment.newInstance().reRun();
+                            } else {
+                                Log.i(TAG, "onClick: 刷新community");
+                                CommunityFragment.newInstance().refreshAllTask();
+                            }
+                        }
+                    }, 500);
+
+
                 });
 
 //        llTest1.setOnClickListener(new MViewClick(1, context));
@@ -350,16 +368,38 @@ public class PopupMenuUtil {
     }
 
     private void afterChoose(String taskClass) {
+        classChoosed = true;
         int id = -1;
         for (TaskClassDto d : classDtoList) {
             if (d.getName().equals(taskClass)) {
-                id = d.getId();
+                id = d.getId() + 1;
                 break;
             }
         }
         Log.i(TAG, "afterChoose: classId=" + id);
         chooseClassBtn.setText(taskClass);
+
         //todo 提交关键词和任务类别 查询价格
+        RequestBody body = new FormBody.Builder()
+                .add("classId", String.valueOf(id))
+                .add("date", String.valueOf(new Date().getTime()))
+                .add("content", desEdit.getText().toString())
+                .build();
+        HttpUtil.getInstance().post(UrlHandler.getPriceEvaluation(),
+                body, new HttpCallbackListener() {
+                    @Override
+                    public void onFinish(String response) {
+                        priceSection = new Gson().fromJson(response, PriceSection.class);
+                        PriceDialog.setContent("为您预估出的价格为" + priceSection.getMin() + "-"
+                                + priceSection.getMax() + ",如果您发布的任务为跑腿代购类，请在加上商品的价格。");
+                        Log.i(TAG, "onFinish: 价格查询完毕" + priceSection.toString());
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        e.printStackTrace();
+                    }
+                });
     }
 
     /**
