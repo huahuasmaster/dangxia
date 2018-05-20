@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion '27.0.3'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId "dangxia.com"
         minSdkVersion 19
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -56,14 +56,14 @@ dependencies {
     implementation 'com.flyco.tablayout:FlycoTabLayout_Lib:2.1.2@aar'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'de.hdodenhof:circleimageview:2.1.0'
-    implementation 'com.afollestad.material-dialogs:core:0.9.4.5'
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'com.jude:easyrecyclerview:4.2.3'
     implementation 'org.litepal.android:core:1.6.1'
-    implementation 'com.jakewharton:butterknife:8.6.0'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation 'org.greenrobot:eventbus:3.0.0'
     implementation 'com.github.LichFaker:Logger:v1.0.0'
-    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'com.google.code.gson:gson:2.8.2'
     implementation 'com.tencent.xinge:xinge:3.2.2-release'
     implementation 'com.tencent.wup:wup:1.0.0.E-release'
     implementation 'com.tencent.mid:mid:4.0.6-release'

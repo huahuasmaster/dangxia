@@ -19,7 +19,7 @@ public class UrlHandler {
     private static String port = "8081";
     private static final String cloudIp = "140.143.225.154";
     private static final String localIp = "192.168.1.102";
-    private static final boolean onCloud = false;
+    private static final boolean onCloud = true;
 
 
     private static SharedPreferences loginSp = ContextApplication

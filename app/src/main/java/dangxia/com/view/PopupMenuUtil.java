@@ -1,6 +1,7 @@
 package dangxia.com.view;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -192,6 +193,7 @@ public class PopupMenuUtil {
     /**
      * 初始化 view
      */
+    @SuppressLint("SetTextI18n")
     private void initLayout(final Context context) {
         tarLatitude = LocationUtil.getInstance().getLatitude();
         tarLongitude = LocationUtil.getInstance().getLongitude();
