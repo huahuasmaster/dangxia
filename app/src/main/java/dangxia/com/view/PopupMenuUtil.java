@@ -85,6 +85,7 @@ public class PopupMenuUtil {
     private Button chooseClassBtn;
     private boolean allowSend = false;//允许发送
     private boolean isQuick = false;//是否为快速需求
+    private boolean desChecked = false;
     private boolean classChoosed = false;//已经选择过大类
     private boolean priceNoticed = false;//提醒过价格
     private boolean chooseNoticed = false;//提醒过去选择分类
@@ -203,6 +204,7 @@ public class PopupMenuUtil {
         cardView = (CardView) rootView.findViewById(R.id.card_back);
         transBack = rootView.findViewById(R.id.trans_back);
         desEdit = (EditText) rootView.findViewById(R.id.description_edittext);
+        desEdit.setOnClickListener((v) -> desChecked = false);
         priceEdit = (EditText) rootView.findViewById(R.id.price_edit);
         auditSwitch = (Switch) rootView.findViewById(R.id.audit_switch);
         locationEdit = (EditText) rootView.findViewById(R.id.location_edit);
@@ -273,16 +275,18 @@ public class PopupMenuUtil {
 
         priceEdit.setOnFocusChangeListener((view, b) -> {
             if (!b) return;
-            if (priceNoticed) return;
+            if (priceNoticed && desChecked) return;
             //最正常的情况->弹出价格提醒弹窗
             if (classChoosed && priceSection != null) {
                 PriceDialog.show();
                 priceNoticed = true;
+                desChecked = true;
             }
             //用户未选择分类则提醒选择分类
             if (!classChoosed && !chooseNoticed) {
                 noticeChooseDialog.show();
                 chooseNoticed = true;
+                desChecked = true;
             }
         });
 //        llTest1 = (LinearLayout) rootView.findViewById(R.id.test1);
@@ -371,6 +375,7 @@ public class PopupMenuUtil {
 
     private void afterChoose(String taskClass) {
         classChoosed = true;
+        desChecked = false;
         int id = -1;
         for (TaskClassDto d : classDtoList) {
             if (d.getName().equals(taskClass)) {
@@ -540,6 +545,7 @@ public class PopupMenuUtil {
         if (popupWindow != null && !popupWindow.isShowing()) {
             popupWindow.showAtLocation(parent, Gravity.NO_GRAVITY, 0, 0);
             _openPopupWindowAction();
+
         }
     }
 
