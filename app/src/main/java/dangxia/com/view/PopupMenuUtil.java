@@ -58,7 +58,6 @@ public class PopupMenuUtil {
     public static final String COMMON_TASK = "长期需求";
 
     private static List<TaskClassDto> classDtoList;
-    private int taskClassId = -1;
     private String type;
     public static final int REQUEST_FOR_LOC = 0x12;
     private static String[] classes;
@@ -85,10 +84,9 @@ public class PopupMenuUtil {
     private Button chooseClassBtn;
     private boolean allowSend = false;//允许发送
     private boolean isQuick = false;//是否为快速需求
-    private boolean desChecked = false;
     private boolean classChoosed = false;//已经选择过大类
-    private boolean priceNoticed = false;//提醒过价格
-    private boolean chooseNoticed = false;//提醒过去选择分类
+    private boolean priceNoticed = false;//提醒过价格，每更改一次分类或者文本都需要重新提醒，即重置此变量为false
+    private boolean chooseNoticed = false;//提醒过去选择分类,每次打开只提醒一次
     private double tarLatitude;
     private double tarLongitude;
     private MaterialDialog chooseClassesDialog;
@@ -109,20 +107,20 @@ public class PopupMenuUtil {
     /**
      * 动画执行的 属性值数组
      */
-    float animatorProperty[] = null;
+    private float animatorProperty[] = null;
     /**
      * 第一排图 距离屏幕底部的距离
      */
-    int top = 0;
+    private int top = 0;
     /**
      * 第二排图 距离屏幕底部的距离
      */
-    int bottom = 0;
+    private int bottom = 0;
 
     /**
      * 卡片的高度
      */
-    int cardHeight = 0;
+    private int cardHeight = 0;
 
     /**
      * 创建 popupWindow 内容
@@ -198,17 +196,32 @@ public class PopupMenuUtil {
     private void initLayout(final Context context) {
         tarLatitude = LocationUtil.getInstance().getLatitude();
         tarLongitude = LocationUtil.getInstance().getLongitude();
-        chooseClassBtn = (Button) rootView.findViewById(R.id.choose_class_btn);
-        rlClick = (RelativeLayout) rootView.findViewById(R.id.pop_rl_click);
-        ivBtn = (ImageView) rootView.findViewById(R.id.pop_iv_img);
-        cardView = (CardView) rootView.findViewById(R.id.card_back);
+        chooseClassBtn = rootView.findViewById(R.id.choose_class_btn);
+        rlClick = rootView.findViewById(R.id.pop_rl_click);
+        ivBtn = rootView.findViewById(R.id.pop_iv_img);
+        cardView = rootView.findViewById(R.id.card_back);
         transBack = rootView.findViewById(R.id.trans_back);
-        desEdit = (EditText) rootView.findViewById(R.id.description_edittext);
-        desEdit.setOnClickListener((v) -> desChecked = false);
-        priceEdit = (EditText) rootView.findViewById(R.id.price_edit);
-        auditSwitch = (Switch) rootView.findViewById(R.id.audit_switch);
-        locationEdit = (EditText) rootView.findViewById(R.id.location_edit);
-        goChooseLoc = (ImageView) rootView.findViewById(R.id.go_choose_loc);
+        desEdit = rootView.findViewById(R.id.description_edittext);
+        desEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                priceNoticed = false;
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        priceEdit = rootView.findViewById(R.id.price_edit);
+        auditSwitch = rootView.findViewById(R.id.audit_switch);
+        locationEdit = rootView.findViewById(R.id.location_edit);
+        goChooseLoc = rootView.findViewById(R.id.go_choose_loc);
         goChooseLoc.setOnClickListener(view -> {
             Intent intent = new Intent(context, LocChooseActivity.class);
             ((Activity) context).startActivityForResult(intent, REQUEST_FOR_LOC);
@@ -228,7 +241,6 @@ public class PopupMenuUtil {
                 .cancelable(false)
                 .items(new String[]{"无类别"})
                 .itemsCallback((dialog, itemView, position, text) -> {
-                    taskClassId = position;
                     afterChoose(text.toString());
                 })
                 .build();
@@ -275,18 +287,16 @@ public class PopupMenuUtil {
 
         priceEdit.setOnFocusChangeListener((view, b) -> {
             if (!b) return;
-            if (priceNoticed && desChecked) return;
+            if (priceNoticed) return;
             //最正常的情况->弹出价格提醒弹窗
             if (classChoosed && priceSection != null) {
                 PriceDialog.show();
                 priceNoticed = true;
-                desChecked = true;
             }
             //用户未选择分类则提醒选择分类
             if (!classChoosed && !chooseNoticed) {
                 noticeChooseDialog.show();
                 chooseNoticed = true;
-                desChecked = true;
             }
         });
 //        llTest1 = (LinearLayout) rootView.findViewById(R.id.test1);
@@ -330,6 +340,7 @@ public class PopupMenuUtil {
                                 .add("latitude", "" + tarLatitude)
                                 .add("longitude", "" + tarLongitude)
                                 .add("price", priceEdit.getText().toString())
+                                .add("classId", String.valueOf(classId))
                                 .build();
 
                         Log.i(TAG, "onClick: " + tarLatitude + "," + tarLongitude);
@@ -373,13 +384,20 @@ public class PopupMenuUtil {
 
     }
 
+    private int classId = -1;
+
     private void afterChoose(String taskClass) {
         classChoosed = true;
-        desChecked = false;
+        priceNoticed = false;
         int id = -1;
+        if (classDtoList == null) {
+            return;
+        }
         for (TaskClassDto d : classDtoList) {
             if (d.getName().equals(taskClass)) {
-                id = d.getId() + 1;
+//                id = d.getId() + 1;
+                id = d.getId();
+                classId = id;
                 break;
             }
         }
@@ -397,8 +415,8 @@ public class PopupMenuUtil {
                     @Override
                     public void onFinish(String response) {
                         priceSection = new Gson().fromJson(response, PriceSection.class);
-                        PriceDialog.setContent("为您预估出的价格为" + priceSection.getMin() + "-"
-                                + priceSection.getMax() + ",如果您发布的任务为跑腿代购类，请在加上商品的价格。");
+                        PriceDialog.setContent("为您预估出的价格为 " + priceSection.getMin() + "-"
+                                + priceSection.getMax() + " ,如果您发布的任务为跑腿代购类，请在加上商品的价格。");
                         Log.i(TAG, "onFinish: 价格查询完毕" + priceSection.toString());
                     }
 
@@ -417,7 +435,7 @@ public class PopupMenuUtil {
         public int index;
         public Context context;
 
-        public MViewClick(int index, Context context) {
+        MViewClick(int index, Context context) {
             this.index = index;
             this.context = context;
         }
@@ -450,7 +468,7 @@ public class PopupMenuUtil {
             checkContent();
         }
     };
-    Toast toast = null;
+    private Toast toast = null;
 
     /**
      * 防止toast 多次被创建
@@ -458,6 +476,7 @@ public class PopupMenuUtil {
      * @param context context
      * @param str     str
      */
+    @SuppressLint("ShowToast")
     private void showToast(Context context, String str) {
         if (toast == null) {
             toast = Toast.makeText(context, str, Toast.LENGTH_SHORT);
@@ -508,12 +527,7 @@ public class PopupMenuUtil {
 //            _closeAnimation(llTest7, 200, bottom);
 //            _closeAnimation(llTest8, 300, bottom);
 
-            rlClick.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    _close();
-                }
-            }, 300);
+            rlClick.postDelayed(this::_close, 300);
 
         }
     }
@@ -545,8 +559,10 @@ public class PopupMenuUtil {
         if (popupWindow != null && !popupWindow.isShowing()) {
             popupWindow.showAtLocation(parent, Gravity.NO_GRAVITY, 0, 0);
             _openPopupWindowAction();
-
         }
+        priceNoticed = false;
+        chooseNoticed = false;
+        classId = -1;
     }
 
     /**
@@ -564,11 +580,7 @@ public class PopupMenuUtil {
      * @return popupWindow 是否显示了
      */
     public boolean _isShowing() {
-        if (popupWindow == null) {
-            return false;
-        } else {
-            return popupWindow.isShowing();
-        }
+        return popupWindow != null && popupWindow.isShowing();
     }
 
     /**

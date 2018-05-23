@@ -80,12 +80,9 @@ public class LoginActivity extends AppCompatActivity {
         phoneEdit.requestFocus();
         phoneEdit.setText("" + loginSp.getString("phone", ""));
         pwdEdit.setText("" + loginSp.getString("password", ""));
-        goRegisterBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(intent);
-            }
+        goRegisterBtn.setOnClickListener(view -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
         });
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,12 +100,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void onFinish(String response) {
                         UserDto userDto = new Gson().fromJson(response, UserDto.class);
                         if (userDto == null) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Snackbar.make(phoneEdit, "登录失败，请检查。", Snackbar.LENGTH_SHORT).show();
-                                }
-                            });
+                            runOnUiThread(() -> Snackbar.make(phoneEdit, "登录失败，请检查。", Snackbar.LENGTH_SHORT).show());
                         } else {
                             loginSp.edit().putString("phone", "" + userDto.getPhone())
                                     .putString("password", password)
@@ -125,14 +117,11 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onError(Exception e) {
                         super.onError(e);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (waitDialog.isShowing()) {
-                                    waitDialog.cancel();
-                                }
-                                Snackbar.make(phoneEdit, "登录失败，请检查。", Snackbar.LENGTH_SHORT).show();
+                        runOnUiThread(() -> {
+                            if (waitDialog.isShowing()) {
+                                waitDialog.cancel();
                             }
+                            Snackbar.make(phoneEdit, "登录失败，请检查。", Snackbar.LENGTH_SHORT).show();
                         });
                     }
                 });
@@ -140,12 +129,14 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        loginBtn.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                return false;
-            }
+        loginBtn.setOnLongClickListener(view -> {
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            return false;
+        });
+
+        goRegisterBtn.setOnLongClickListener(view -> {
+            startActivity(new Intent(LoginActivity.this, IpConfigActivity.class));
+            return false;
         });
         //检查权限，动态申请未给予的权限
         List<String> permissionList = new ArrayList<>();

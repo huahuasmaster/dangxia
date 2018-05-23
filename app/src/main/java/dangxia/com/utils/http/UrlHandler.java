@@ -18,8 +18,7 @@ public class UrlHandler {
     private static String loginPort = "8081";
     private static String port = "8081";
     private static final String cloudIp = "140.143.225.154";
-    private static final String localIp = "192.168.1.102";
-    private static final boolean onCloud = true;
+    private static boolean onCloud = true;
 
 
     private static SharedPreferences loginSp = ContextApplication
@@ -115,7 +114,7 @@ public class UrlHandler {
 
     //获取服务器ip
     public static String getIp() {
-        return onCloud ? cloudIp : localIp;
+        return onCloud ? cloudIp : getLocalIp();
     }
 
     //设置服务器ip
@@ -125,12 +124,15 @@ public class UrlHandler {
 
     //获取登录ip
     public static String getLoginIp() {
-        return onCloud ? cloudIp : localIp;
+        return getIp();
     }
 
-    //设置登录ip
-    public static void setLoginIp(String ip) {
-        loginSp.edit().putString("login_ip", ip).apply();
+    public static void setLocalIp(String newLocalIp) {
+        loginSp.edit().putString("local_ip", newLocalIp).apply();
+    }
+
+    public static String getLocalIp() {
+        return loginSp.getString("local_ip", cloudIp);
     }
 
     public static String getPort() {
@@ -157,5 +159,11 @@ public class UrlHandler {
         loginSp.edit().putInt("user_id", userId).apply();
     }
 
+    public static boolean isOnCloud() {
+        return onCloud;
+    }
 
+    public static void setOnCloud(boolean onCloud) {
+        UrlHandler.onCloud = onCloud;
+    }
 }

@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -28,6 +29,9 @@ import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.TextureMapView;
 import com.baidu.mapapi.model.LatLng;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dangxia.com.R;
 import dangxia.com.utils.location.LocationUtil;
 import dangxia.com.view.PopupMenuUtil;
@@ -43,7 +47,20 @@ public class LocChooseActivity extends AppCompatActivity {
     //操作地图的封装类
     private BaiduMap baiduMap;
 
-    private FloatingActionButton fab;
+//    private FloatingActionButton fab;
+
+    @BindView(R.id.confirm_loc_choose)
+    ImageView checkBtn;
+
+    @OnClick(R.id.confirm_loc_choose)
+    void onClick() {
+        Intent intent = new Intent();
+        intent.putExtra("latitude", targetLatitude);
+        intent.putExtra("longitude", targetLongtitude);
+        Log.i(TAG, "onClick: 返回了新坐标:" + targetLatitude + "," + targetLongtitude);
+        setResult(0x13, intent);
+        finish();
+    }
 
     public LocationClient mLocationClient;
 
@@ -55,18 +72,19 @@ public class LocChooseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loc_choose);
-        fab = (FloatingActionButton) findViewById(R.id.confirm_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.putExtra("latitude", targetLatitude);
-                intent.putExtra("longitude", targetLongtitude);
-                Log.i(TAG, "onClick: 返回了新坐标:" + targetLatitude + "," + targetLongtitude);
-                setResult(0x13, intent);
-                finish();
-            }
-        });
+        ButterKnife.bind(this);
+//        fab = (FloatingActionButton) findViewById(R.id.confirm_fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent();
+//                intent.putExtra("latitude", targetLatitude);
+//                intent.putExtra("longitude", targetLongtitude);
+//                Log.i(TAG, "onClick: 返回了新坐标:" + targetLatitude + "," + targetLongtitude);
+//                setResult(0x13, intent);
+//                finish();
+//            }
+//        });
         mapView = (TextureMapView) findViewById(R.id.mapview);
         mapView.showZoomControls(false);
         baiduMap = mapView.getMap();
@@ -116,7 +134,7 @@ public class LocChooseActivity extends AppCompatActivity {
             }
         });
 
-        final Snackbar snackbar = Snackbar.make(fab, "按住并拖拽小红点以选取任务执行地点",
+        final Snackbar snackbar = Snackbar.make(mapView, "按住并拖拽小红点以选取任务执行地点",
                 Snackbar.LENGTH_LONG);
         snackbar.setAction("知道了", new View.OnClickListener() {
             @Override
