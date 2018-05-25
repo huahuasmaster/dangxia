@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -23,14 +24,17 @@ import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.TextureMapView;
 import com.baidu.mapapi.model.LatLng;
+import com.github.library.bubbleview.BubbleTextView;
 import com.google.gson.Gson;
 
 import java.net.URL;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dangxia.com.R;
 import dangxia.com.adapter.MsgChatItemAdapter;
 import dangxia.com.entity.ConversationDto;
@@ -59,6 +63,13 @@ public class TaskDetailActivity extends AppCompatActivity {
 
     @BindView(R.id.mapview_task_detail)
     TextureMapView mapView;
+
+    @OnClick(R.id.navigate_task_detail)
+    void goNavigate() {
+        Intent naviIntent = new Intent("android.intent.action.VIEW",
+                android.net.Uri.parse("baidumap://map/geocoder?location=" + mTask.getLatitude() + "," + mTask.getLongitude()));
+        startActivity(naviIntent);
+    }
 
     private TaskDto mTask;
 
@@ -155,11 +166,16 @@ public class TaskDetailActivity extends AppCompatActivity {
         baiduMap.animateMapStatus(update);
 
         //添加一个marker
-        BitmapDescriptor bdGround = BitmapDescriptorFactory
-                .fromResource(R.drawable.icon_gcoding);
-        MarkerOptions options = new MarkerOptions().position(ll).icon(bdGround).draggable(false);
-        options.animateType(MarkerOptions.MarkerAnimateType.drop);
-        final Marker mMarker = (Marker) baiduMap.addOverlay(options);
+        BubbleTextView textView = (BubbleTextView) LayoutInflater
+                .from(this).inflate(R.layout.new_label, null);
+        textView.setText(mTask.getLocation());
+        textView.setAlpha(0.78f);
+
+        BitmapDescriptor bitmap = BitmapDescriptorFactory.fromView(textView);
+
+        OverlayOptions options = new MarkerOptions().position(ll).icon(bitmap);
+
+        Marker marker = (Marker) baiduMap.addOverlay(options);
     }
 
     private void goChat(final int conId) {

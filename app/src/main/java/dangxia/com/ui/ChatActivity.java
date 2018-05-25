@@ -21,6 +21,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jude.easyrecyclerview.EasyRecyclerView;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.io.LineNumberReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,6 +39,7 @@ import dangxia.com.entity.MessageDto;
 import dangxia.com.utils.http.HttpCallbackListener;
 import dangxia.com.utils.http.HttpUtil;
 import dangxia.com.utils.http.UrlHandler;
+import dangxia.com.utils.mqtt.MqttMsgBean;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 
@@ -79,7 +83,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         ButterKnife.bind(this);
-
+        EventBus.getDefault().register(this);
         mConversation = (ConversationDto) getIntent().getSerializableExtra("con");
         if (mConversation == null) {
             Toast.makeText(this, "不存在的会话，请重试。", Toast.LENGTH_SHORT).show();
@@ -91,14 +95,11 @@ public class ChatActivity extends AppCompatActivity {
         }
         Log.i("chat", "onCreate: " + conId);
         Log.i("chat", "onCreate: " + mConversation.toString());
-        checkOrder = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(ChatActivity.this,
-                        OrderDetailActivity.class);
-                intent.putExtra("taskId", mConversation.getTask().getId());
-                startActivity(intent);
-            }
+        checkOrder = view -> {
+            Intent intent = new Intent(ChatActivity.this,
+                    OrderDetailActivity.class);
+            intent.putExtra("taskId", mConversation.getTask().getId());
+            startActivity(intent);
         };
         name.setText(owner ?
                 mConversation.getInitiatorName() : mConversation.getPublisherName());
@@ -125,14 +126,11 @@ public class ChatActivity extends AppCompatActivity {
                                 final Snackbar snackbar = Snackbar.make(confirmBtn,
                                         "您的需求已被成功接单！", Snackbar.LENGTH_SHORT);
                                 snackbar.setAction("查看订单", checkOrder);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        snackbar.show();
-                                        ordered = true;
-                                        confirmBtn.setText("查看订单");
-                                        confirmBtn.setOnClickListener(checkOrder);
-                                    }
+                                runOnUiThread(() -> {
+                                    snackbar.show();
+                                    ordered = true;
+                                    confirmBtn.setText("查看订单");
+                                    confirmBtn.setOnClickListener(checkOrder);
                                 });
                             }
                         }
@@ -140,12 +138,7 @@ public class ChatActivity extends AppCompatActivity {
                         @Override
                         public void onError(Exception e) {
                             super.onError(e);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(ChatActivity.this, "确认失败，请稍后再试", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                            runOnUiThread(() -> Toast.makeText(ChatActivity.this, "确认失败，请稍后再试", Toast.LENGTH_SHORT).show());
                         }
                     });
 
@@ -155,30 +148,17 @@ public class ChatActivity extends AppCompatActivity {
         initMsgData();
 
 
-        sendBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!TextUtils.isEmpty(presendET.getText())) {
-                    sendMsg(presendET.getText().toString());
-                    presendET.setText("");
+        sendBtn.setOnClickListener(view -> {
+            if (!TextUtils.isEmpty(presendET.getText())) {
+                sendMsg(presendET.getText().toString());
+                presendET.setText("");
 //                    presendET.clearComposingText();
-                }
             }
         });
 
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        backBtn.setOnClickListener(view -> finish());
         presendET.addTextChangedListener(new MyTextWatcher());
-        findViewById(R.id.check_info_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(ChatActivity.this, OthersInfoActivity.class));
-            }
-        });
+        findViewById(R.id.check_info_btn).setOnClickListener(view -> startActivity(new Intent(ChatActivity.this, OthersInfoActivity.class)));
 
 
     }
@@ -197,12 +177,9 @@ public class ChatActivity extends AppCompatActivity {
                 msgList = new Gson().fromJson(response, new TypeToken<List<MessageDto>>() {
                 }.getType());
                 if (msgList != null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.setMsgList(msgList);
-                            adapter.notifyDataSetChanged();
-                        }
+                    runOnUiThread(() -> {
+                        adapter.setMsgList(msgList);
+                        adapter.notifyDataSetChanged();
                     });
                 }
             }
@@ -222,10 +199,14 @@ public class ChatActivity extends AppCompatActivity {
                 .build();
         HttpUtil.getInstance().post(UrlHandler.pushMsg(conId), body,
                 null);
+        insertAndScroll(messageDto);
+    }
+
+    private void insertAndScroll(MessageDto messageDto) {
         adapter.getMsgList().add(messageDto);
         adapter.notifyItemRangeChanged(adapter.getMsgList().size() - 2, 1);
         adapter.notifyItemInserted(adapter.getMsgList().size() - 1);
-        chatList.scrollToPosition(adapter.getMsgList().size() - 1);
+        scrollToBottom();
     }
 
     private void checkEdit() {
@@ -255,13 +236,29 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                chatList.scrollToPosition(adapter.getMsgList().size() - 1);
-            }
-        });
+        scrollToBottom();
+    }
+
+    private void scrollToBottom() {
+        chatList.scrollToPosition(adapter.getMsgList().size() - 1);
+    }
+
+    @Subscribe()//监听eventbus事件
+    public void onEvent(MqttMsgBean mqttMsgBean) {
+        Log.i("chat", "onEvent: 监听到busevent" + mqttMsgBean.toString());
+        //将消息反序列化为MessageDto
+        String msg = mqttMsgBean.getMqttMessage().toString();
+        MessageDto messageDto = new Gson().fromJson(msg, MessageDto.class);
+        if (messageDto != null) {
+            runOnUiThread(() -> insertAndScroll(messageDto));
+        }
     }
 }

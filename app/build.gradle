@@ -73,6 +73,8 @@ dependencies {
     implementation 'com.android.support:support-vector-drawable:25.3.1'
     implementation name: 'SMSSDK-3.0.0', ext: 'aar'
     implementation name: 'SMSSDKGUI-3.0.0', ext: 'aar'
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
+    implementation 'org.greenrobot:eventbus:3.0.0'
 //    compile 'com.google.dagger:dagger:2.12'
 //    annotationProcessor 'com.google.dagger:dagger-compiler:2.12'
 

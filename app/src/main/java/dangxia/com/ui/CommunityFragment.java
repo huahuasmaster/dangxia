@@ -76,21 +76,13 @@ public class CommunityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.fragment_community, null);
-        tabLayout = (SlidingTabLayout) v.findViewById(R.id.community_tab);
-        viewPager = (ViewPager) v.findViewById(R.id.page);
-        searchView = (SearchView) v.findViewById(R.id.searchView);
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                tabLayout.setVisibility(View.INVISIBLE);
-            }
-        });
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                tabLayout.setVisibility(View.VISIBLE);
-                return false;
-            }
+        tabLayout = v.findViewById(R.id.community_tab);
+        viewPager = v.findViewById(R.id.page);
+        searchView = v.findViewById(R.id.searchView);
+        searchView.setOnSearchClickListener(view -> tabLayout.setVisibility(View.INVISIBLE));
+        searchView.setOnCloseListener(() -> {
+            tabLayout.setVisibility(View.VISIBLE);
+            return false;
         });
         allTaskPage = inflater.inflate(R.layout.page_all_task, null);
         myTaskPage = inflater.inflate(R.layout.page_my_task, null);
@@ -120,7 +112,7 @@ public class CommunityFragment extends Fragment {
                 if (taskDto.getPublisher() == UrlHandler.getUserId()) {
                     intent.putExtra("task_relation", TaskDetailActivity.PUBLISHED);
                 } else {
-                    if (taskDto.getOrderId() == 0) {
+                    if (taskDto.getOrderId() == -1) {
                         //如果不是自己发布的，说明自己是吃瓜群众
                         intent.putExtra("task_relation", TaskDetailActivity.NO_RELATIONSHIP);
                     } else {
@@ -138,28 +130,18 @@ public class CommunityFragment extends Fragment {
     }
 
     private void initMyTaskPage(View view) {
-        myTaskRV = (RecyclerView) view.findViewById(R.id.my_task_rv);
-        swipeMyTask = (SwipeRefreshLayout) view.findViewById(R.id.swipe_my_task);
-        swipeMyTask.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshMyTask();
-            }
-        });
+        myTaskRV = view.findViewById(R.id.my_task_rv);
+        swipeMyTask = view.findViewById(R.id.swipe_my_task);
+        swipeMyTask.setOnRefreshListener(this::refreshMyTask);
         swipeMyTask.setRefreshing(true);
         refreshMyTask();
     }
 
 
     private void initAllTaskPage(View view) {
-        allTaskRV = (RecyclerView) view.findViewById(R.id.all_task_rv);
-        swipeAllTask = (SwipeRefreshLayout) view.findViewById(R.id.swipe_all_task);
-        swipeAllTask.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshAllTask();
-            }
-        });
+        allTaskRV = view.findViewById(R.id.all_task_rv);
+        swipeAllTask = view.findViewById(R.id.swipe_all_task);
+        swipeAllTask.setOnRefreshListener(this::refreshAllTask);
         swipeAllTask.setRefreshing(true);
         refreshAllTask();
     }
@@ -173,32 +155,27 @@ public class CommunityFragment extends Fragment {
                 Log.i("mytask", "onFinish: " + response);
                 myTask = new Gson().fromJson(response, new TypeToken<List<TaskDto>>() {
                 }.getType());
-                if (myTaskAdapter == null) {
-                    myTaskAdapter = new TaskItemAdapter();
-                    myTaskAdapter.setContext(getContext());
-                    myTaskAdapter.setListener(listener);
-                    myTaskRV.setLayoutManager(new LinearLayoutManager(getContext()));
-                    myTaskRV.setAdapter(myTaskAdapter);
-                }
-                if (myTask == null) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                getActivity().runOnUiThread(() -> {
+                    if (myTaskAdapter == null) {
+                        myTaskAdapter = new TaskItemAdapter();
+                        myTaskAdapter.setContext(getContext());
+                        myTaskAdapter.setListener(listener);
+                        myTaskRV.setLayoutManager(new LinearLayoutManager(getContext()));
+                        myTaskRV.setAdapter(myTaskAdapter);
+                    }
+                    if (myTask == null) {
+                        getActivity().runOnUiThread(() -> {
                             if (swipeAllTask.isRefreshing()) {
                                 swipeAllTask.setRefreshing(false);
                             }
-                        }
-                    });
-                    return;
-                }
-                myTaskAdapter.setTaskDtos(myTask);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        myTaskAdapter.notifyDataSetChanged();
-                        if (swipeMyTask.isRefreshing()) {
-                            swipeMyTask.setRefreshing(false);
-                        }
+                        });
+                        return;
+                    }
+                    myTaskAdapter.setTaskDtos(myTask);
+
+                    myTaskAdapter.notifyDataSetChanged();
+                    if (swipeMyTask.isRefreshing()) {
+                        swipeMyTask.setRefreshing(false);
                     }
                 });
 
@@ -209,12 +186,7 @@ public class CommunityFragment extends Fragment {
 
     public void refreshAllTask() {
         if (!swipeAllTask.isRefreshing()) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    swipeAllTask.setRefreshing(true);
-                }
-            });
+            getActivity().runOnUiThread(() -> swipeAllTask.setRefreshing(true));
         }
         //获取数据
         HttpUtil.getInstance().get(UrlHandler.getAllTask(LocationUtil.getInstance().getLatitude(),
@@ -226,7 +198,9 @@ public class CommunityFragment extends Fragment {
                 Log.i("alltask", "onFinish: " + response);
                 allTask = new Gson().fromJson(response, new TypeToken<List<TaskDto>>() {
                 }.getType());
-                if (allTaskAdapter == null) {
+                getActivity().runOnUiThread(() -> {
+
+                    if (allTaskAdapter == null) {
                     allTaskAdapter = new TaskItemAdapter();
                     allTaskAdapter.setContext(getContext());
                     allTaskAdapter.setListener(listener);
@@ -234,25 +208,18 @@ public class CommunityFragment extends Fragment {
                     allTaskRV.setAdapter(allTaskAdapter);
                 }
                 if (allTask == null) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (swipeAllTask.isRefreshing()) {
-                                swipeAllTask.setRefreshing(false);
-                            }
+                    getActivity().runOnUiThread(() -> {
+                        if (swipeAllTask.isRefreshing()) {
+                            swipeAllTask.setRefreshing(false);
                         }
                     });
 
                     return;
                 }
                 allTaskAdapter.setTaskDtos(allTask);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        allTaskAdapter.notifyDataSetChanged();
-                        if (swipeAllTask.isRefreshing()) {
-                            swipeAllTask.setRefreshing(false);
-                        }
+                    allTaskAdapter.notifyDataSetChanged();
+                    if (swipeAllTask.isRefreshing()) {
+                        swipeAllTask.setRefreshing(false);
                     }
                 });
 
