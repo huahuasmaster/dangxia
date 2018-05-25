@@ -23,6 +23,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import dangxia.com.R;
 import dangxia.com.adapter.TaskItemAdapter;
@@ -116,7 +117,18 @@ public class CommunityFragment extends Fragment {
             public void onMain(TaskDto taskDto) {
                 Intent intent = new Intent(getContext(), TaskDetailActivity.class);
                 intent.putExtra("task_dto", taskDto);
-                getActivity().startActivity(intent);
+                if (taskDto.getPublisher() == UrlHandler.getUserId()) {
+                    intent.putExtra("task_relation", TaskDetailActivity.PUBLISHED);
+                } else {
+                    if (taskDto.getOrderId() == 0) {
+                        //如果不是自己发布的，说明自己是吃瓜群众
+                        intent.putExtra("task_relation", TaskDetailActivity.NO_RELATIONSHIP);
+                    } else {
+                        //这是一条自己能看见的，有订单的他人任务，那么这肯定是自己接下的任务
+                        intent.putExtra("task_relation", TaskDetailActivity.ACEEPTED);
+                    }
+                }
+                Objects.requireNonNull(getActivity()).startActivity(intent);
             }
         };
 

@@ -5,64 +5,65 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="dangxia.com.ui.TaskDetailActivity">
+
+    <TextView
+        android:id="@+id/textView10"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:background="#fff"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView4"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView10"
+        tools:layout_editor_absoluteX="8dp">
+
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:background="#fff"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:id="@+id/textView10" />
+            android:id="@+id/chat_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="任务详情"
+            android:textColor="@color/text_title"
+            android:textSize="16sp" />
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/cardView4"
-            android:layout_width="0dp"
+        <View
+            android:id="@+id/back_btn"
+            android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView10"
-            tools:layout_editor_absoluteX="8dp" >
+            android:background="@drawable/circle_back"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground" />
 
-            <TextView
-                android:id="@+id/chat_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="任务详情"
-                android:textColor="@color/text_title"
-                android:textSize="16sp" />
-            <View
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:id="@+id/back_btn"
-                android:background="@drawable/circle_back"
-                android:foreground="?attr/selectableItemBackground"
-                />
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginLeft="8dp"
-                app:srcCompat="@drawable/ic_arrow_left"
-                android:layout_gravity="center_vertical"
-                />
-        </android.support.v7.widget.CardView>
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dp"
+            app:srcCompat="@drawable/ic_arrow_left" />
+    </android.support.v7.widget.CardView>
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#fff"
+        app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView4"
-        android:layout_marginBottom="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/cardView5">
+        app:layout_constraintTop_toBottomOf="@+id/cardView4">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -85,13 +86,13 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:id="@+id/name_detail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="0dp"
                     android:layout_marginStart="8dp"
                     android:alpha="0.78"
                     android:text="doge先生"
-                    android:id="@+id/name_detail"
                     android:textColor="#000"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -107,57 +108,81 @@
                 android:layout_marginRight="16dp"
                 android:alpha="0.26"
                 android:background="#000" />
+
             <TextView
+                android:id="@+id/price_detail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="￥999"
-                android:id="@+id/price_detail"
-                android:textColor="@android:color/holo_red_light"
-                android:textStyle="bold"
-                android:textSize="22sp"
                 android:layout_marginTop="16dp"
                 android:paddingLeft="16dp"
-                />
+                android:text="￥999"
+                android:textColor="@android:color/holo_red_light"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
             <TextView
+                android:id="@+id/content_detail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#000"
+                android:alpha="0.78"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingTop="8dp"
-                android:alpha="0.78"
-                android:id="@+id/content_detail"
-                android:textSize="18sp"
                 android:text="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                />
+                android:textColor="#000"
+                android:textSize="18sp" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
+
+    <com.baidu.mapapi.map.TextureMapView
+        android:id="@+id/mapview_task_detail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/cardView5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline2">
+
+
+    </com.baidu.mapapi.map.TextureMapView>
+
     <android.support.v7.widget.CardView
+        android:id="@+id/cardView5"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_marginBottom="0dp"
-        tools:layout_editor_absoluteX="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:id="@+id/cardView5">
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteX="0dp">
+
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <Button
+                android:id="@+id/order_take_btn"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/order_take_btn"
-                android:text="我要接单"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
-                app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginTop="8dp"
+                android:text="我要接单"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginBottom="8dp" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
         </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.CardView>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
 
 </android.support.constraint.ConstraintLayout>

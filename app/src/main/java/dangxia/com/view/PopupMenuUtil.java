@@ -240,9 +240,7 @@ public class PopupMenuUtil {
                 .title("请选择需求类型")
                 .cancelable(false)
                 .items(new String[]{"无类别"})
-                .itemsCallback((dialog, itemView, position, text) -> {
-                    afterChoose(text.toString());
-                })
+                .itemsCallback((dialog, itemView, position, text) -> afterChoose(text.toString()))
                 .build();
         if (classDtoList != null) {
             chooseClassesDialog.setItems(classes);

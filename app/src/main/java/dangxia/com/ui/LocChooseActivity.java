@@ -85,7 +85,7 @@ public class LocChooseActivity extends AppCompatActivity {
 //                finish();
 //            }
 //        });
-        mapView = (TextureMapView) findViewById(R.id.mapview);
+        mapView = findViewById(R.id.mapview);
         mapView.showZoomControls(false);
         baiduMap = mapView.getMap();
         baiduMap.setMyLocationEnabled(true);
@@ -136,12 +136,7 @@ public class LocChooseActivity extends AppCompatActivity {
 
         final Snackbar snackbar = Snackbar.make(mapView, "按住并拖拽小红点以选取任务执行地点",
                 Snackbar.LENGTH_LONG);
-        snackbar.setAction("知道了", new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                snackbar.dismiss();
-            }
-        });
+        snackbar.setAction("知道了", view -> snackbar.dismiss());
         snackbar.show();
     }
 
@@ -178,11 +173,6 @@ public class LocChooseActivity extends AppCompatActivity {
                 .content("坐标将不会保存")
                 .positiveText("继续退出")
                 .negativeText("取消")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        finish();
-                    }
-                }).show();
+                .onPositive((dialog, which) -> finish()).show();
     }
 }
