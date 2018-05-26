@@ -139,6 +139,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        if (getIntent().getBooleanExtra("check_alert", false)) {
+            Log.i("main", "onStart: 来自点击通知后的跳转");
+            tab.setCurrentTab(3);
+        }
+        super.onStart();
+    }
+
+    @Override
     public void onBackPressed() {
         // 当popupWindow 正在展示的时候 按下返回键 关闭popupWindow 否则关闭activity
         if (PopupMenuUtil.getInstance()._isShowing()) {
@@ -155,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 1:
                 if (grantResults.length > 0) {

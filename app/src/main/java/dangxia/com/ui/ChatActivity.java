@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -17,9 +18,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jude.easyrecyclerview.EasyRecyclerView;
+import com.lichfaker.log.Logger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -32,13 +35,16 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dangxia.com.R;
 import dangxia.com.adapter.MsgChatItemAdapter;
 import dangxia.com.entity.ConversationDto;
 import dangxia.com.entity.MessageDto;
+import dangxia.com.entity.TaskDto;
 import dangxia.com.utils.http.HttpCallbackListener;
 import dangxia.com.utils.http.HttpUtil;
 import dangxia.com.utils.http.UrlHandler;
+import dangxia.com.utils.mqtt.MqttManager;
 import dangxia.com.utils.mqtt.MqttMsgBean;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
@@ -66,17 +72,29 @@ public class ChatActivity extends AppCompatActivity {
 
     private MsgChatItemAdapter adapter;
 
-    @BindView(R.id.back_btn)
-    View backBtn;
+    @OnClick(R.id.task_detail)
+    void showChangePriceDialog() {
+        if (ordered || !owner) return;//当且仅当自己是任务的发布者，并且订单未生效时才能修改价格
+        changePriceDialog.show();
+    }
+
+    @OnClick(R.id.back_btn)
+    void back() {
+        finish();
+    }
+
     private boolean ordered = false;
     private boolean owner = false;
     private View.OnClickListener checkOrder;
     private ConversationDto mConversation;
+    private TaskDto mTask;
+    private MaterialDialog changePriceDialog;
     private int conId;
 
     @SuppressLint("SimpleDateFormat")
     private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,20 +109,28 @@ public class ChatActivity extends AppCompatActivity {
             return;
         } else {
             owner = mConversation.getInitiatorId() != UrlHandler.getUserId();
-            ordered = mConversation.getTask().getOrderId() != -1;
+            mTask = mConversation.getTask();
+            ordered = mTask.getOrderId() != -1;
         }
         Log.i("chat", "onCreate: " + conId);
         Log.i("chat", "onCreate: " + mConversation.toString());
         checkOrder = view -> {
             Intent intent = new Intent(ChatActivity.this,
                     OrderDetailActivity.class);
-            intent.putExtra("taskId", mConversation.getTask().getId());
+            intent.putExtra("taskId", mTask.getId());
             startActivity(intent);
         };
         name.setText(owner ?
                 mConversation.getInitiatorName() : mConversation.getPublisherName());
         conId = mConversation.getId();
-        taskDetail.setText(mConversation.getTask().getContent());
+        changePriceDialog = new MaterialDialog
+                .Builder(ChatActivity.this)
+                .title("修改价格")
+                .inputType(InputType.TYPE_CLASS_NUMBER)
+                .positiveText("确认")
+                .input("请输入新价格", "" + mTask.getPrice(), false,
+                        (dialog, input) -> changePrice(Double.parseDouble(input.toString()))).build();
+        taskDetail.setText("￥" + mTask.getPrice() + " " + mTask.getContent());
         if (ordered) {
             confirmBtn.setText("查看订单");
             confirmBtn.setOnClickListener(checkOrder);
@@ -114,9 +140,10 @@ public class ChatActivity extends AppCompatActivity {
             confirmBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View view) {
+                    //订单授权
                     RequestBody body = new FormBody.Builder()
                             .add("senderId", String.valueOf(mConversation.getInitiatorId()))
-                            .add("taskId", String.valueOf(mConversation.getTask().getId()))
+                            .add("taskId", String.valueOf(mTask.getId()))
                             .build();
                     HttpUtil.getInstance().post(UrlHandler.takeOrder(), body, new HttpCallbackListener() {
                         @Override
@@ -156,7 +183,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        backBtn.setOnClickListener(view -> finish());
         presendET.addTextChangedListener(new MyTextWatcher());
         findViewById(R.id.check_info_btn).setOnClickListener(view -> startActivity(new Intent(ChatActivity.this, OthersInfoActivity.class)));
 
@@ -210,11 +236,33 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void checkEdit() {
-        if (TextUtils.isEmpty(presendET.getText())) {
-            sendBtn.setEnabled(false);
-        } else {
-            sendBtn.setEnabled(true);
-        }
+        sendBtn.setEnabled(!TextUtils.isEmpty(presendET.getText()));
+    }
+
+    private void changePrice(double newPrice) {
+        RequestBody body = new FormBody.Builder()
+                .add("taskId", String.valueOf(mTask.getId()).trim())
+                .add("newPrice", String.valueOf(newPrice).trim())
+                .build();
+        HttpUtil.getInstance().post(UrlHandler.changePrice(), body, new HttpCallbackListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onFinish(String response) {
+                if (response.equals("1")) {
+                    runOnUiThread(() -> {
+                        Snackbar.make(taskDetail, "修改成功", Snackbar.LENGTH_SHORT).show();
+                        mTask.setPrice(newPrice);
+                        taskDetail.setText("￥" + mTask.getPrice() + " " + mTask.getContent());
+                    });
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                super.onError(e);
+                Logger.e(e.getMessage());
+            }
+        });
     }
 
     class MyTextWatcher implements TextWatcher {
@@ -239,6 +287,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+        MqttManager.getInstance().setNeedNotify(true);
     }
 
     @Override
@@ -252,13 +301,16 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     @Subscribe()//监听eventbus事件
-    public void onEvent(MqttMsgBean mqttMsgBean) {
-        Log.i("chat", "onEvent: 监听到busevent" + mqttMsgBean.toString());
+    public void onEvent(MessageDto messageDto) {
+        Log.i("chat", "onEvent: 监听到busevent" + messageDto.toString());
         //将消息反序列化为MessageDto
-        String msg = mqttMsgBean.getMqttMessage().toString();
-        MessageDto messageDto = new Gson().fromJson(msg, MessageDto.class);
-        if (messageDto != null) {
             runOnUiThread(() -> insertAndScroll(messageDto));
-        }
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        MqttManager.getInstance().setNeedNotify(false);
+    }
+
 }

@@ -62,12 +62,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_order_detail);
         ButterKnife.bind(this);
         taskId = getIntent().getIntExtra("taskId", -1);
-        findViewById(R.id.back_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        findViewById(R.id.back_btn).setOnClickListener(view -> finish());
         waitDialog = new MaterialDialog.Builder(this)
                 .title("查询中")
                 .progress(true, 0)
@@ -84,38 +79,30 @@ public class OrderDetailActivity extends AppCompatActivity {
                 .content("欠款将直接打入对方账户。")
                 .negativeText("取消")
                 .positiveText("确定")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        String url = UrlHandler.finishOrder(orderDto.getId());
-                        RequestBody body = new FormBody.Builder()
-                                .add("date", String.valueOf(new Date().getTime()))
-                                .build();
-                        HttpUtil.getInstance().post(url, body, new HttpCallbackListener() {
-                            @Override
-                            public void onFinish(String response) {
-                                if (response.equals("1")) {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Snackbar.make(fab, "交易成功！", Snackbar.LENGTH_SHORT).show();
-                                            fab.setEnabled(false);
-                                            title.setText("订单详情（已完成）");
-                                        }
-                                    });
+                .onPositive((dialog, which) -> {
+                    String url = UrlHandler.finishOrder(orderDto.getId());
+                    RequestBody body = new FormBody.Builder()
+                            .add("date", String.valueOf(new Date().getTime()))
+                            .build();
+                    HttpUtil.getInstance().post(url, body, new HttpCallbackListener() {
+                        @Override
+                        public void onFinish(String response) {
+                            if (response.equals("1")) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Snackbar.make(fab, "交易成功！", Snackbar.LENGTH_SHORT).show();
+                                        fab.setEnabled(false);
+                                        title.setText("订单详情（已完成）");
+                                    }
+                                });
 
-                                }
                             }
-                        });
-                    }
+                        }
+                    });
                 })
                 .build();
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                confirmDialog.show();
-            }
-        });
+        fab.setOnClickListener(view -> confirmDialog.show());
         initViews();
     }
 
@@ -126,26 +113,23 @@ public class OrderDetailActivity extends AppCompatActivity {
             @Override
             public void onFinish(String response) {
                 orderDto = new Gson().fromJson(response, OrderDto.class);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (orderDto != null) {
-                            content.setText(orderDto.getTaskDto().getContent());
-                            price.setText("￥" + orderDto.getTaskDto().getPrice());
-                            executorName.setText(orderDto.getExecutorName());
-                            date.setText(orderDto.getOrderDate());
-                            add.setText(orderDto.getTaskDto().getLocation());
-                            if (orderDto.getExecutorId() == UrlHandler.getUserId()) {
-                                //如果自己是执行者，那么将无法使用完成按钮
-                                fab.setVisibility(View.GONE);
-                            }
-                            if (orderDto.getStatus() > 0) {
-                                fab.setVisibility(View.INVISIBLE);
-                                title.setText("订单详情（已完成）");
-                            }
-                            if (waitDialog.isShowing()) {
-                                waitDialog.dismiss();
-                            }
+                runOnUiThread(() -> {
+                    if (orderDto != null) {
+                        content.setText(orderDto.getTaskDto().getContent());
+                        price.setText("￥" + orderDto.getTaskDto().getPrice());
+                        executorName.setText(orderDto.getExecutorName());
+                        date.setText(orderDto.getOrderDate());
+                        add.setText(orderDto.getTaskDto().getLocation());
+                        if (orderDto.getExecutorId() == UrlHandler.getUserId()) {
+                            //如果自己是执行者，那么将无法使用完成按钮
+                            fab.setVisibility(View.GONE);
+                        }
+                        if (orderDto.getStatus() > 0) {
+                            fab.setVisibility(View.GONE);
+                            title.setText("订单详情（已完成）");
+                        }
+                        if (waitDialog.isShowing()) {
+                            waitDialog.dismiss();
                         }
                     }
                 });

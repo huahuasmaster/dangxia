@@ -1,8 +1,16 @@
 package dangxia.com.utils.mqtt;
 
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
+import com.google.gson.Gson;
 import com.lichfaker.log.Logger;
 
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -13,8 +21,14 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.greenrobot.eventbus.EventBus;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import dangxia.com.R;
 import dangxia.com.application.ContextApplication;
-import dangxia.com.utils.http.UrlHandler;
+import dangxia.com.entity.MessageDto;
+import dangxia.com.ui.MainActivity;
 
 /**
  * 管理mqtt的连接,发布,订阅,断开连接, 断开重连等操作
@@ -40,6 +54,8 @@ public class MqttManager {
 
     // 单例
     private static MqttManager mInstance = null;
+
+    public boolean needNotify = true;//是否需要notify通知
 
     // 回调
     private MqttCallback mCallback;
@@ -72,27 +88,37 @@ public class MqttManager {
                         final MqttMsgBean topicMessage = SubPubQueue.getMsgQueue().take();
                         Logger.e("广播消息:" + topicMessage.getMqttMessage().toString());
                         //广播消息
-                        new Thread(() -> EventBus.getDefault().post(topicMessage)).start();
-//                            Context mContext = ContextApplication.getContext();
-//                                NotificationManager manager = (NotificationManager)
-//                                        mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-//                                Intent intent = new Intent(mContext, MainActivity.class);
-//                                intent.putExtra("check_alert",true);
-//                                PendingIntent pendingIntent = PendingIntent
-//                                        .getActivity(mContext,0,intent,0);
-//                                Notification notification = new NotificationCompat.Builder(mContext)
-//                                        .setContentTitle(alertType.getTitle())
-//                                        .setContentText(content)
-//                                        .setWhen(date.getTime())
-//                                        .setAutoCancel(true)
-//                                        .setContentIntent(pendingIntent)
-//                                        .setDefaults(NotificationCompat.DEFAULT_ALL)
-//                                        .setSmallIcon(R.mipmap.ic_launcher)
-//                                        .setPriority(Notification.PRIORITY_MAX)
-//                                        .build();
-//                                manager.notify(1,notification);
+                        String msg = topicMessage.getMqttMessage().toString();
+                        MessageDto messageDto = new Gson().fromJson(msg, MessageDto.class);
+                        new Thread(() -> EventBus.getDefault().post(messageDto)).start();
 
-                    } catch (InterruptedException e) {
+                        if (!needNotify) return;
+                        @SuppressLint("SimpleDateFormat") DateFormat dateFormat =
+                                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        Context mContext = ContextApplication.getContext();
+                        Logger.i("开始进行横幅通知");
+                        NotificationManager manager = (NotificationManager)
+                                mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+                        Intent intent = new Intent(mContext, MainActivity.class);
+                        intent.putExtra("check_msg", true);
+                        PendingIntent pendingIntent = PendingIntent
+                                .getActivity(mContext, 0, intent, 0);
+                        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_launcher_round);
+                        Notification notification = new Notification.Builder(mContext)
+                                .setContentTitle(messageDto.getSenderName())
+                                .setContentText(messageDto.getContent())
+                                .setWhen(dateFormat.parse(messageDto.getDate()).getTime())
+                                .setAutoCancel(true)
+                                .setContentIntent(pendingIntent)
+                                .setDefaults(Notification.DEFAULT_ALL)
+                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setLargeIcon(bitmap)
+                                .setPriority(Notification.PRIORITY_MAX)
+                                .build();
+                        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+                        manager.notify(2, notification);
+
+                    } catch (InterruptedException | ParseException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
@@ -315,5 +341,13 @@ public class MqttManager {
      */
     public boolean isConnecting() {
         return client != null && client.isConnected();
+    }
+
+    public boolean isNeedNotify() {
+        return needNotify;
+    }
+
+    public void setNeedNotify(boolean needNotify) {
+        this.needNotify = needNotify;
     }
 }

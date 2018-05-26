@@ -73,6 +73,11 @@ public class UrlHandler {
         return getHead() + "/order";
     }
 
+    //修改价格
+    public static String changePrice() {
+        return getHead() + "/task/newPrice";
+    }
+
     public static String getOrderByTask(int taskId) {
         return getHead() + "/order/" + taskId + "/byTask";
     }

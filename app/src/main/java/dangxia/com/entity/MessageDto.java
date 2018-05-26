@@ -13,6 +13,7 @@ public class MessageDto implements Serializable {
 
     private int sender; //0->订单所有者、1->申请接单者
 
+    private String senderName;
 
     private int type;//0->文字消息（默认）、1->语音消息、2->图片消息
 
@@ -73,9 +74,18 @@ public class MessageDto implements Serializable {
                 "id=" + id +
                 ", content='" + content + '\'' +
                 ", date='" + date + '\'' +
-                ", senderId=" + sender +
+                ", sender=" + sender +
+                ", senderName='" + senderName + '\'' +
                 ", type=" + type +
                 ", status=" + status +
                 '}';
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
     }
 }

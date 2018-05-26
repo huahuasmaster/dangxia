@@ -64,7 +64,6 @@
             android:layout_gravity="right|center_vertical"
             android:text="审核通过"
             tools:ignore="RtlHardcoded" />
-
         <TextView
             android:id="@+id/task_detail"
             android:layout_width="wrap_content"
@@ -72,7 +71,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="32dp"
             android:maxLines="1"
-            android:text="求带王者农药"
+            android:text="￥666 求带王者农药"
             android:textSize="16sp" />
     </android.support.v7.widget.CardView>
 
