@@ -101,6 +101,11 @@ public class UrlHandler {
         return getHead() + "/conversation/" + conId + "/msglist";
     }
 
+    //获取任务当前的价格
+    public static String getCurrentPrice(int id) {
+        return getHead() + "/task/" + id + "/price";
+    }
+
     public static String finishOrder(int id) {
         return getHead() + "/order/" + id;
     }
@@ -171,4 +176,6 @@ public class UrlHandler {
     public static void setOnCloud(boolean onCloud) {
         UrlHandler.onCloud = onCloud;
     }
+
+
 }

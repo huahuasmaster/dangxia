@@ -50,6 +50,8 @@ import okhttp3.FormBody;
 import okhttp3.RequestBody;
 
 public class ChatActivity extends AppCompatActivity {
+
+    private static final String TAG = "chat";
     @BindView(R.id.chat_list)
     EasyRecyclerView chatList;
 
@@ -73,9 +75,39 @@ public class ChatActivity extends AppCompatActivity {
     private MsgChatItemAdapter adapter;
 
     @OnClick(R.id.task_detail)
-    void showChangePriceDialog() {
-        if (ordered || !owner) return;//当且仅当自己是任务的发布者，并且订单未生效时才能修改价格
-        changePriceDialog.show();
+    void onTaskDetailClick() {
+        //当且仅当自己是任务的发布者，并且订单未生效时才能修改价格
+        if (!ordered && owner) {
+            changePriceDialog.show();
+        } else {//其余情况下，只是刷新价格
+            String url = UrlHandler.getCurrentPrice(mTask.getId());
+            HttpUtil.getInstance().get(url, new HttpCallbackListener() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onFinish(String response) {
+                    try {
+                        double newPrice = Double.parseDouble(response);
+                        if (newPrice != mTask.getPrice()) {
+                            mTask.setPrice(newPrice);
+                            runOnUiThread(() -> {
+                                taskDetail.setText("￥" + newPrice + " " + mTask.getContent());
+                                Toast.makeText(ChatActivity.this,
+                                        "价格已更新为" + newPrice + "元", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    } catch (NumberFormatException e) {
+                        onError(e);
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    super.onError(e);
+                    Log.i(TAG, "onError: 刷新价格失败" + e.getMessage());
+                }
+            });
+        }
+
     }
 
     @OnClick(R.id.back_btn)
@@ -304,7 +336,7 @@ public class ChatActivity extends AppCompatActivity {
     public void onEvent(MessageDto messageDto) {
         Log.i("chat", "onEvent: 监听到busevent" + messageDto.toString());
         //将消息反序列化为MessageDto
-            runOnUiThread(() -> insertAndScroll(messageDto));
+        runOnUiThread(() -> insertAndScroll(messageDto));
     }
 
     @Override
