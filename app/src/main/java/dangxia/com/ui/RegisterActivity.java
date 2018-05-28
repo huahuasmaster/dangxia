@@ -92,6 +92,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                     if (userDto == null) {
                                         Toast.makeText(RegisterActivity.this, "注册失败", Toast.LENGTH_SHORT).show();
                                     } else {
+                                        UrlHandler.setUserId(userDto.getId());
                                         startActivity(new Intent(RegisterActivity.this, MainActivity.class));
                                     }
                                 });

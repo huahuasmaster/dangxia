@@ -18,7 +18,6 @@ public class UrlHandler {
     private static String loginPort = "8081";
     private static String port = "8081";
     private static final String cloudIp = "140.143.225.154";
-    private static boolean onCloud = true;
 
 
     private static SharedPreferences loginSp = ContextApplication
@@ -40,7 +39,6 @@ public class UrlHandler {
     //获取附近的快速任务
     public static String getQuickTask(double latitude, double longitude, double radius) {
         return getHead() + "/task/" + latitude + "/" + longitude + "/" + radius + "/nearbyQuick";
-
     }
 
     //获取自己领取的任务
@@ -124,7 +122,7 @@ public class UrlHandler {
 
     //获取服务器ip
     public static String getIp() {
-        return onCloud ? cloudIp : getLocalIp();
+        return isOnCloud() ? cloudIp : getLocalIp();
     }
 
     //设置服务器ip
@@ -170,11 +168,11 @@ public class UrlHandler {
     }
 
     public static boolean isOnCloud() {
-        return onCloud;
+        return loginSp.getBoolean("on_cloud", false);
     }
 
     public static void setOnCloud(boolean onCloud) {
-        UrlHandler.onCloud = onCloud;
+        loginSp.edit().putBoolean("on_cloud", onCloud).apply();
     }
 
 

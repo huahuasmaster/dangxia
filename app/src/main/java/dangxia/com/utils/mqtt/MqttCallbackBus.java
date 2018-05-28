@@ -1,11 +1,15 @@
 package dangxia.com.utils.mqtt;
 
 
+import com.google.gson.Gson;
 import com.lichfaker.log.Logger;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.greenrobot.eventbus.EventBus;
+
+import dangxia.com.entity.MessageDto;
 
 /**
  * 使用EventBus分发事件
@@ -27,7 +31,13 @@ public class MqttCallbackBus implements MqttCallback {
                 "==== 当前队列长度:" + SubPubQueue.getMsgQueue().size());
 //        Log.e("mqtt","新消息");
         MqttMsgBean bean = new MqttMsgBean(topic, message);
-        SubPubQueue.getMsgQueue().add(bean);
+//        String msg = bean.getMqttMessage().toString();
+//        MessageDto messageDto = new Gson().fromJson(msg, MessageDto.class);
+        try {
+            SubPubQueue.getMsgQueue().put(bean);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 

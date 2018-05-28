@@ -91,41 +91,40 @@ public class MqttManager {
                         String msg = topicMessage.getMqttMessage().toString();
                         MessageDto messageDto = new Gson().fromJson(msg, MessageDto.class);
                         new Thread(() -> EventBus.getDefault().post(messageDto)).start();
+//                            if (!needNotify) return;
+//                            @SuppressLint("SimpleDateFormat") DateFormat dateFormat =
+//                                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                            Context mContext = ContextApplication.getContext();
+//                            Logger.i("开始进行横幅通知");
+//                            NotificationManager manager = (NotificationManager)
+//                                    mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+//                            Intent intent = new Intent(mContext, MainActivity.class);
+//                            intent.putExtra("check_msg", true);
+//                            PendingIntent pendingIntent = PendingIntent
+//                                    .getActivity(mContext, 0, intent, 0);
+//                            Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_launcher_round);
+//                            Notification notification = new Notification.Builder(mContext)
+//                                    .setContentTitle(messageDto.getSenderName())
+//                                    .setContentText(messageDto.getContent())
+//                                    .setWhen(dateFormat.parse(messageDto.getDate()).getTime())
+//                                    .setAutoCancel(true)
+//                                    .setContentIntent(pendingIntent)
+//                                    .setDefaults(Notification.DEFAULT_ALL)
+//                                    .setSmallIcon(R.mipmap.ic_launcher)
+//                                    .setLargeIcon(bitmap)
+//                                    .setPriority(Notification.PRIORITY_MAX)
+//                                    .build();
+//                            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+//                            manager.notify(2, notification);
 
-                        if (!needNotify) return;
-                        @SuppressLint("SimpleDateFormat") DateFormat dateFormat =
-                                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        Context mContext = ContextApplication.getContext();
-                        Logger.i("开始进行横幅通知");
-                        NotificationManager manager = (NotificationManager)
-                                mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-                        Intent intent = new Intent(mContext, MainActivity.class);
-                        intent.putExtra("check_msg", true);
-                        PendingIntent pendingIntent = PendingIntent
-                                .getActivity(mContext, 0, intent, 0);
-                        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_launcher_round);
-                        Notification notification = new Notification.Builder(mContext)
-                                .setContentTitle(messageDto.getSenderName())
-                                .setContentText(messageDto.getContent())
-                                .setWhen(dateFormat.parse(messageDto.getDate()).getTime())
-                                .setAutoCancel(true)
-                                .setContentIntent(pendingIntent)
-                                .setDefaults(Notification.DEFAULT_ALL)
-                                .setSmallIcon(R.mipmap.ic_launcher)
-                                .setLargeIcon(bitmap)
-                                .setPriority(Notification.PRIORITY_MAX)
-                                .build();
-                        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-                        manager.notify(2, notification);
-
-                    } catch (InterruptedException | ParseException e) {
+                    } catch (InterruptedException /*| ParseException*/ e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-
                 }
 
             }
+
         };
         Logger.e("队列开始启动");
         thread.start();

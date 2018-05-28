@@ -47,6 +47,7 @@ public class MsgChatItemAdapter extends RecyclerView.Adapter{
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (holder == null) return;
         MsgHolder msgHolder = (MsgHolder)holder;
         MessageDto bean = msgList.get(position);
         //填充信息内容
@@ -70,6 +71,7 @@ public class MsgChatItemAdapter extends RecyclerView.Adapter{
 
     @Override
     public int getItemViewType(int position) {
+        if (msgList.get(position).getType() == -1) return 3;
         if (msgList.get(position).getSender() == UrlHandler.getUserId()) {
             return 0;
         } else {
@@ -85,9 +87,9 @@ public class MsgChatItemAdapter extends RecyclerView.Adapter{
         MsgHolder(View itemView) {
             super(itemView);
 
-            dateTxt = (TextView) itemView.findViewById(R.id.chat_item_date);
-            contentTxt = (BubbleTextView) itemView.findViewById(R.id.chat_item_content_image);
-            headerImg = (CircleImageView) itemView.findViewById(R.id.chat_item_header);
+            dateTxt = itemView.findViewById(R.id.chat_item_date);
+            contentTxt = itemView.findViewById(R.id.chat_item_content_image);
+            headerImg = itemView.findViewById(R.id.chat_item_header);
         }
     }
 

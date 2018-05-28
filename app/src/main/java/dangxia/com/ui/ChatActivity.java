@@ -27,7 +27,6 @@ import com.lichfaker.log.Logger;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.io.LineNumberReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,7 +44,6 @@ import dangxia.com.utils.http.HttpCallbackListener;
 import dangxia.com.utils.http.HttpUtil;
 import dangxia.com.utils.http.UrlHandler;
 import dangxia.com.utils.mqtt.MqttManager;
-import dangxia.com.utils.mqtt.MqttMsgBean;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 
@@ -79,31 +77,65 @@ public class ChatActivity extends AppCompatActivity {
         //当且仅当自己是任务的发布者，并且订单未生效时才能修改价格
         if (!ordered && owner) {
             changePriceDialog.show();
-        } else {//其余情况下，只是刷新价格
-            String url = UrlHandler.getCurrentPrice(mTask.getId());
-            HttpUtil.getInstance().get(url, new HttpCallbackListener() {
+        } else {//其余情况下，只是刷新价格和订单状态
+//            String url = UrlHandler.getCurrentPrice(mTask.getId());
+//            HttpUtil.getInstance().get(url, new HttpCallbackListener() {
+//                @SuppressLint("SetTextI18n")
+//                @Override
+//                public void onFinish(String response) {
+//                    try {
+//                        double newPrice = Double.parseDouble(response);
+//                        if (newPrice != mTask.getPrice()) {
+//                            mTask.setPrice(newPrice);
+//                            runOnUiThread(() -> {
+//                                taskDetail.setText("￥" + newPrice + " " + mTask.getContent());
+//                                Toast.makeText(ChatActivity.this,
+//                                        "价格已更新为" + newPrice + "元", Toast.LENGTH_SHORT).show();
+//                            });
+//                        }
+//                    } catch (NumberFormatException e) {
+//                        onError(e);
+//                    }
+//                }
+//
+//                @Override
+//                public void onError(Exception e) {
+//                    super.onError(e);
+//                    Log.i(TAG, "onError: 刷新价格失败" + e.getMessage());
+//                }
+//            });
+            HttpUtil.getInstance().get(UrlHandler.getCon(mConversation.getId()), new HttpCallbackListener() {
                 @SuppressLint("SetTextI18n")
                 @Override
                 public void onFinish(String response) {
-                    try {
-                        double newPrice = Double.parseDouble(response);
-                        if (newPrice != mTask.getPrice()) {
-                            mTask.setPrice(newPrice);
+                    ConversationDto conversationDto =
+                            new Gson().fromJson(response, ConversationDto.class);
+                    if (conversationDto != null && mConversation.getId() == conversationDto.getId()) {
+                        //进行比较，看看价格或者订单状态有没有更改
+                        if (mTask.getPrice() != conversationDto.getTask().getPrice()) {
+                            // 价格已发生改变
                             runOnUiThread(() -> {
+                                double newPrice = conversationDto.getTask().getPrice();
                                 taskDetail.setText("￥" + newPrice + " " + mTask.getContent());
                                 Toast.makeText(ChatActivity.this,
                                         "价格已更新为" + newPrice + "元", Toast.LENGTH_SHORT).show();
                             });
                         }
-                    } catch (NumberFormatException e) {
-                        onError(e);
+                        if (conversationDto.getTask().getOrderId() != -1) {
+                            // 订单状态已发生改变
+                            runOnUiThread(() -> {
+                                ordered = true;
+                                confirmBtn.setEnabled(true);
+                                confirmBtn.setVisibility(View.VISIBLE);
+                                confirmBtn.setText("查看订单");
+                                confirmBtn.setOnClickListener(checkOrder);
+                                Toast.makeText(ChatActivity.this,
+                                        "订单已建立", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                        mConversation = conversationDto;
+                        mTask = mConversation.getTask();
                     }
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    super.onError(e);
-                    Log.i(TAG, "onError: 刷新价格失败" + e.getMessage());
                 }
             });
         }
@@ -275,6 +307,7 @@ public class ChatActivity extends AppCompatActivity {
         RequestBody body = new FormBody.Builder()
                 .add("taskId", String.valueOf(mTask.getId()).trim())
                 .add("newPrice", String.valueOf(newPrice).trim())
+                .add("receiverId", String.valueOf(mConversation.getInitiatorId()))
                 .build();
         HttpUtil.getInstance().post(UrlHandler.changePrice(), body, new HttpCallbackListener() {
             @SuppressLint("SetTextI18n")
@@ -336,7 +369,15 @@ public class ChatActivity extends AppCompatActivity {
     public void onEvent(MessageDto messageDto) {
         Log.i("chat", "onEvent: 监听到busevent" + messageDto.toString());
         //将消息反序列化为MessageDto
-        runOnUiThread(() -> insertAndScroll(messageDto));
+        runOnUiThread(() -> {
+            if (messageDto.getType() != -1) {
+                insertAndScroll(messageDto);
+            } else if (messageDto.getContent().contains(MessageDto.PRICE_CHANGED)
+                    || messageDto.getContent().contains(MessageDto.ORDER_CREATED)) {
+                Log.i(TAG, "onEvent: 需要刷新一下状态");
+                onTaskDetailClick();
+            }
+        });
     }
 
     @Override
