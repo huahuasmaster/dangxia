@@ -68,21 +68,14 @@ public class TaskItemAdapter extends RecyclerView.Adapter {
         // TODO: 2018/2/21 为头像新增点击事件
         myHolder.icon.setImageResource(dto.getPublisher() == 2 ?
                 R.mipmap.doge : R.mipmap.doge2);
-        myHolder.icon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listener.onIcon(i);
-            }
-        });
+
         myHolder.name.setText(dto.getPublisherName());
         myHolder.price.setText("￥" + dto.getPrice());
         myHolder.time.setText(dto.getPublishDate());
-        myHolder.wholeView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listener.onMain(dto);
-            }
-        });
+        if (listener != null) {
+            myHolder.wholeView.setOnClickListener(view -> listener.onMain(dto));
+            myHolder.icon.setOnClickListener(view -> listener.onIcon(i));
+        }
 
     }
 
@@ -116,13 +109,13 @@ public class TaskItemAdapter extends RecyclerView.Adapter {
         public MyHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(itemView);
-            icon = (ImageView) itemView.findViewById(R.id.icon);
-            name = (TextView) itemView.findViewById(R.id.name);
-            price = (TextView) itemView.findViewById(R.id.price);
-            content = (TextView) itemView.findViewById(R.id.content);
-            time = (TextView) itemView.findViewById(R.id.time);
-            distance = (TextView) itemView.findViewById(R.id.distance);
-            wholeView = (CardView) itemView.findViewById(R.id.whole_view);
+            icon = itemView.findViewById(R.id.icon);
+            name = itemView.findViewById(R.id.name);
+            price = itemView.findViewById(R.id.price);
+            content = itemView.findViewById(R.id.content);
+            time = itemView.findViewById(R.id.time);
+            distance = itemView.findViewById(R.id.distance);
+            wholeView = itemView.findViewById(R.id.whole_view);
         }
     }
 }

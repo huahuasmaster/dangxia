@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -57,7 +58,7 @@ import dangxia.com.view.PopupMenuUtil;
  * Created by zhuang_ge on 2017/11/17.
  */
 
-public class QuickFragment extends Fragment{
+public class QuickFragment extends Fragment {
 
     private static QuickFragment fragment;
 
@@ -73,6 +74,7 @@ public class QuickFragment extends Fragment{
 
     private FloatingActionButton fab;
 
+    private static final String TAG = "QUICK";
 
     private List<TaskDto> taskBeans = new ArrayList<>();
 
@@ -81,89 +83,76 @@ public class QuickFragment extends Fragment{
 
     private CardView bottomLabel;
     private ImageView closeBtn;
+
     public QuickFragment() {
     }
 
     public static QuickFragment newInstance() {
-        if(fragment == null) {
+        if (fragment == null) {
             fragment = new QuickFragment();
         }
         return fragment;
     }
 
+    @SuppressLint("SetTextI18n")
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_quick,null);
+        View v = inflater.inflate(R.layout.fragment_quick, null);
 
-        mapView = (TextureMapView) v.findViewById(R.id.bmapView);
-        bottomLabel = (CardView) v.findViewById(R.id.bottom_label);
-        closeBtn = (ImageView) v.findViewById(R.id.close_btn);
-        fab = (FloatingActionButton) v.findViewById(R.id.refresh_fab);
+        mapView = v.findViewById(R.id.bmapView);
+        bottomLabel = v.findViewById(R.id.bottom_label);
+        closeBtn = v.findViewById(R.id.close_btn);
+        fab = v.findViewById(R.id.refresh_fab);
         mapView.showZoomControls(false);
         baiduMap = mapView.getMap();
         baiduMap.setMyLocationEnabled(true);
         baiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
-        mLocationClient = new LocationClient(getActivity().getApplicationContext());
+        mLocationClient = new LocationClient(Objects.requireNonNull(getActivity()).getApplicationContext());
         mLocationClient.registerLocationListener(new MyLocationListener());
         mLocationClient.start();
         setLocationRefresh();
         initLables();
-        baiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                final TaskDto taskBean = map.get(marker);
-                if(taskBean != null ) {
+        baiduMap.setOnMarkerClickListener(marker -> {
+            final TaskDto taskBean = map.get(marker);
+            if (taskBean != null) {
 //                    Toast.makeText(getContext(),
 //                            "点击了"+taskBean.getContent(),Toast.LENGTH_SHORT).show();
-                    bottomLabel.setVisibility(View.VISIBLE);
-                    //设置内容
-                    ((TextView) bottomLabel.findViewById(R.id.label_content)
-                    ).setText(taskBean.getContent());
-                    //设置价格
-                    ((TextView) bottomLabel.findViewById(R.id.label_price)
-                    ).setText("￥" + taskBean.getPrice());
-                    //设置距离
-                    ((TextView) bottomLabel.findViewById(R.id.label_distance)
-                    ).setText(DistanceUtil.km(LocationUtil.getInstance().getLatitude(),
-                            LocationUtil.getInstance().getLongitude(),
-                            taskBean.getLatitude(), taskBean.getLongitude()) + "km");
-                    //设置姓名
-                    ((TextView) bottomLabel.findViewById(R.id.label_name)
-                    ).setText(taskBean.getPublisherName());
-                    //设置电话
+                bottomLabel.setVisibility(View.VISIBLE);
+                //设置内容
+                ((TextView) bottomLabel.findViewById(R.id.label_content)
+                ).setText(taskBean.getContent());
+                //设置价格
+                ((TextView) bottomLabel.findViewById(R.id.label_price)
+                ).setText("￥" + taskBean.getPrice());
+                //设置距离
+                ((TextView) bottomLabel.findViewById(R.id.label_distance)
+                ).setText(DistanceUtil.km(LocationUtil.getInstance().getLatitude(),
+                        LocationUtil.getInstance().getLongitude(),
+                        taskBean.getLatitude(), taskBean.getLongitude()) + "km");
+                //设置姓名
+                ((TextView) bottomLabel.findViewById(R.id.label_name)
+                ).setText(taskBean.getPublisherName());
+                //设置电话
 //                    ((TextView)bottomLabel.findViewById(R.id.label_phone)
 //                    ).setText(taskBean.getContent());
-                    fab.setVisibility(View.INVISIBLE);
-                    bottomLabel.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent intent = new Intent(getContext(), TaskDetailActivity.class);
-                            intent.putExtra("task_dto", taskBean);
-                            startActivity(intent);
-                        }
-                    });
+                fab.setVisibility(View.INVISIBLE);
+                bottomLabel.setOnClickListener(view -> {
+                    Intent intent = new Intent(getContext(), TaskDetailActivity.class);
+                    intent.putExtra("task_dto", taskBean);
+                    startActivity(intent);
+                });
 
-                }
-                return false;
             }
+            return false;
         });
-        closeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                bottomLabel.setVisibility(View.INVISIBLE);
-                fab.setVisibility(View.VISIBLE);
-            }
+        closeBtn.setOnClickListener(view -> {
+            bottomLabel.setVisibility(View.INVISIBLE);
+            fab.setVisibility(View.VISIBLE);
         });
 
         locationSp = getActivity().getSharedPreferences("location_sp", Context.MODE_PRIVATE);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                initLables();
-            }
-        });
+        fab.setOnClickListener(view -> initLables());
         return v;
     }
 
@@ -195,12 +184,13 @@ public class QuickFragment extends Fragment{
         });
     }
 
+    @SuppressLint("SetTextI18n")
     private void addMarker(TaskDto taskBean) {
         LatLng point = new LatLng(taskBean.getLatitude(), taskBean.getLongitude());
         BubbleTextView textView = (BubbleTextView) LayoutInflater
-                .from(getContext()).inflate(R.layout.new_label,null);
-        textView.setText("￥"+taskBean.getPrice()+" "+taskBean.getContent());
-        textView.setAlpha(0.87f);
+                .from(getContext()).inflate(R.layout.new_label, null);
+        textView.setText("￥" + taskBean.getPrice() + " " + taskBean.getContent());
+        textView.setAlpha(0.78f);
 
         BitmapDescriptor bitmap = BitmapDescriptorFactory.fromView(textView);
 
@@ -208,7 +198,7 @@ public class QuickFragment extends Fragment{
 
         Marker marker = (Marker) baiduMap.addOverlay(options);
         //将生成的maker保存
-        map.put(marker,taskBean);
+        map.put(marker, taskBean);
     }
 
     //每五秒钟更新自己的位置
@@ -269,14 +259,17 @@ public class QuickFragment extends Fragment{
             if (bdLocation.getLocType() == BDLocation.TypeGpsLocation
                     || bdLocation.getLocType() == BDLocation.TypeNetWorkLocation) {
                 //将地图定位至当前位置
-//                locationSp.edit().putString("latitude",""+bdLocation.getLatitude()).apply();
-//                locationSp.edit().putString("longitude",""+bdLocation.getLongitude()).apply();
+                if (LocationUtil.getInstance().isRealLocation()) {
+                    locationSp.edit().putString("latitude", "" + bdLocation.getLatitude()).apply();
+                    Log.i(TAG, "onReceiveLocation: " + bdLocation.getLatitude() + "," + bdLocation.getLongitude());
+                    locationSp.edit().putString("longitude", "" + bdLocation.getLongitude()).apply();
+                }
 //                LocationUtil.getInstance().setLatitude(31.248493);
 //                LocationUtil.getInstance().setLongitude(120.608842);
                 StringBuilder simplePositon = new StringBuilder();
                 simplePositon.append(bdLocation.getStreet())
                         .append(bdLocation.getStreetNumber());
-                if(bdLocation.getAddrStr() != null) {
+                if (bdLocation.getAddrStr() != null) {
                     locationSp.edit().putString("location", simplePositon.toString()).apply();
                     PopupMenuUtil.getInstance().refreshLocation(simplePositon.toString());
                 } else {
@@ -284,7 +277,6 @@ public class QuickFragment extends Fragment{
 
                 }
 //                Toast.makeText(getContext(),simplePositon.toString(),Toast.LENGTH_LONG).show();
-                // TODO: 2018/3/7  
                 navigateTo(LocationUtil.getInstance().getLatitude(), LocationUtil.getInstance().getLongitude());
 //                navigateTo(bdLocation.getLatitude(),bdLocation.getLongitude());
             }

@@ -155,8 +155,8 @@ public class ChatActivity extends AppCompatActivity {
     private MaterialDialog changePriceDialog;
     private int conId;
 
-    @SuppressLint("SimpleDateFormat")
-    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//    @SuppressLint("SimpleDateFormat")
+//    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @SuppressLint("SetTextI18n")
     @Override

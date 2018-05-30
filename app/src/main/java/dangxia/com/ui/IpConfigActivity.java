@@ -17,6 +17,7 @@ import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import dangxia.com.R;
 import dangxia.com.utils.http.UrlHandler;
+import dangxia.com.utils.location.LocationUtil;
 
 
 public class IpConfigActivity extends AppCompatActivity {
@@ -27,6 +28,9 @@ public class IpConfigActivity extends AppCompatActivity {
     @BindView(R.id.switch_oncloud)
     Switch aSwitch;
 
+    @BindView(R.id.switch_fake_location)
+    Switch locationModeSwitch;
+
     @OnClick(R.id.check)
     void onClick() {
         UrlHandler.setLocalIp(newIpEdit.getText().toString());
@@ -34,6 +38,11 @@ public class IpConfigActivity extends AppCompatActivity {
         Toast.makeText(IpConfigActivity.this, "新ip:" + UrlHandler.getIp(), Toast.LENGTH_SHORT)
                 .show();
         finish();
+    }
+
+    @OnCheckedChanged(R.id.switch_fake_location)
+    void onLocationModeChanged(CompoundButton compoundButton, boolean b) {
+        LocationUtil.getInstance().setRealLocation(!b);
     }
 
     @OnCheckedChanged(R.id.switch_oncloud)
@@ -48,5 +57,6 @@ public class IpConfigActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         newIpEdit.setText(UrlHandler.getLocalIp());
         aSwitch.setChecked(UrlHandler.isOnCloud());
+        locationModeSwitch.setChecked(!LocationUtil.getInstance().isRealLocation());
     }
 }

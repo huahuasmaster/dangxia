@@ -108,9 +108,18 @@ public class UrlHandler {
         return getHead() + "/order/" + id;
     }
 
+    public static String getServed() {
+        return getHead() + "/task/" + getUserId() + "/served";
+    }
+
+    public static String getBeServed() {
+        return getHead() + "/task/" + getUserId() + "/beServed";
+    }
+
     public static String getTaskClasses() {
         return getHead() + "/task/classes";
     }
+
     /**
      * 获取(除了登录接口)请求的开头ip与端口
      *

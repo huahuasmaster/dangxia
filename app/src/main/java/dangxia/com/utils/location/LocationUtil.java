@@ -12,7 +12,7 @@ public class LocationUtil {
     private final String TAG = "location";
     private SharedPreferences sp;
 
-    public LocationUtil() {
+    private LocationUtil() {
         sp = ContextApplication.getContext().getSharedPreferences("location_sp", Context.MODE_PRIVATE);
     }
 
@@ -40,5 +40,13 @@ public class LocationUtil {
     public void setLongitude(double longitude) {
         Log.i(TAG, "setLatitude: 录入" + longitude);
         sp.edit().putString("longitude", "" + longitude).apply();
+    }
+
+    public boolean isRealLocation() {
+        return sp.getBoolean("real_location", false);
+    }
+
+    public void setRealLocation(boolean realLocation) {
+        sp.edit().putBoolean("real_location", realLocation).apply();
     }
 }

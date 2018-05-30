@@ -42,55 +42,52 @@ public class HttpUtil {
 
     public void sendRequestWithCallback(final RequestTypeEnum method, final String address, final RequestBody body, final HttpCallbackListener listener
     ) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Request.Builder builder = new Request.Builder()
-                        .url(address).header("token", token);
+        new Thread(() -> {
+            Request.Builder builder = new Request.Builder()
+                    .url(address).header("token", token);
 
-                switch (method) {
-                    case POST:
-                        builder.post(body);
-                        break;
-                    case PUT:
-                        builder.put(body);
-                        break;
-                    case DELETE:
-                        builder.delete(body);
-                        break;
-                    default:
-                        builder.get();
-                        break;
+            switch (method) {
+                case POST:
+                    builder.post(body);
+                    break;
+                case PUT:
+                    builder.put(body);
+                    break;
+                case DELETE:
+                    builder.delete(body);
+                    break;
+                default:
+                    builder.get();
+                    break;
+            }
+
+            Request request = builder.build();
+            try {
+                //实际进行请求的代码
+                Log.i("url = ", address);
+                Response response = client.newCall(request).execute();
+                token = response.header("token");
+                if (token == null) {
+                    token = "b06804b910ea4f96a714a84d686d8583";
+                    Log.i("", "没有token使用默认token");
+                } else {
+                    Log.i("", "收到token：" + token);
                 }
 
-                Request request = builder.build();
-                try {
-                    //实际进行请求的代码
-                    Log.i("url = ", address);
-                    Response response = client.newCall(request).execute();
-                    token = response.header("token");
-                    if (token == null) {
-                        token = "b06804b910ea4f96a714a84d686d8583";
-                        Log.i("", "没有token使用默认token");
+                editor.putString("token", token).apply();
+                String result = response.body().string();
+                if (result != null && listener != null) {
+                    //当response的code大于200，小于300时，视作请求成功
+                    if (response.isSuccessful()) {
+                        listener.onFinish(result);
                     } else {
-                        Log.i("", "收到token：" + token);
+                        listener.onError(new ServerException(result));
                     }
+                }
 
-                    editor.putString("token", token).apply();
-                    String result = response.body().string();
-                    if (result != null && listener != null) {
-                        //当response的code大于200，小于300时，视作请求成功
-                        if (response.isSuccessful()) {
-                            listener.onFinish(result);
-                        } else {
-                            listener.onError(new ServerException(result));
-                        }
-                    }
-
-                } catch (IOException e) {
-                    if (listener != null) {
-                        listener.onError(e);
-                    }
+            } catch (IOException e) {
+                if (listener != null) {
+                    listener.onError(e);
                 }
             }
         }).start();

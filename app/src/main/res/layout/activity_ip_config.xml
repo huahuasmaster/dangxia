@@ -40,6 +40,12 @@
             android:id="@+id/switch_oncloud"
             android:layout_gravity="center_horizontal" />
 
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="使用演示位置"
+            android:id="@+id/switch_fake_location"
+            android:layout_gravity="center_horizontal" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
