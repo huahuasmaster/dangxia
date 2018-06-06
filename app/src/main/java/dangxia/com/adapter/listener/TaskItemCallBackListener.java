@@ -1,6 +1,6 @@
 package dangxia.com.adapter.listener;
 
-import dangxia.com.entity.TaskDto;
+import dangxia.com.dto.TaskDto;
 
 public interface TaskItemCallBackListener {
     void onIcon(int userId);

@@ -1,13 +1,15 @@
-package dangxia.com.entity;
+package dangxia.com.dto;
 
-import java.util.Date;
+import org.litepal.crud.DataSupport;
 
-public class MessageDto {
+public class MessageDto extends DataSupport {
 
     public static final String PRICE_CHANGED = "$price_changed$";
     public static final String ORDER_CREATED = "$order_created$";
 
-    private int id;
+    private int msgId;
+
+    private int conversationId;
 
     private String content;
 
@@ -21,12 +23,12 @@ public class MessageDto {
 
     private int status;
 
-    public int getId() {
-        return id;
+    public int getMsgId() {
+        return msgId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setMsgId(int msgId) {
+        this.msgId = msgId;
     }
 
     public String getContent() {
@@ -70,18 +72,6 @@ public class MessageDto {
         this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return "MessageDto{" +
-                "id=" + id +
-                ", content='" + content + '\'' +
-                ", date='" + date + '\'' +
-                ", sender=" + sender +
-                ", senderName='" + senderName + '\'' +
-                ", type=" + type +
-                ", status=" + status +
-                '}';
-    }
 
     public String getSenderName() {
         return senderName;
@@ -89,5 +79,27 @@ public class MessageDto {
 
     public void setSenderName(String senderName) {
         this.senderName = senderName;
+    }
+
+    public int getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(int conversationId) {
+        this.conversationId = conversationId;
+    }
+
+    @Override
+    public String toString() {
+        return "MessageDto{" +
+                "msgId=" + msgId +
+                ", conversationId=" + conversationId +
+                ", content='" + content + '\'' +
+                ", date='" + date + '\'' +
+                ", sender=" + sender +
+                ", senderName='" + senderName + '\'' +
+                ", type=" + type +
+                ", status=" + status +
+                '}';
     }
 }

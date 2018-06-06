@@ -17,7 +17,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dangxia.com.R;
 import dangxia.com.adapter.TaskItemAdapter;
-import dangxia.com.entity.TaskDto;
+import dangxia.com.dto.TaskDto;
 import dangxia.com.utils.http.HttpCallbackListener;
 import dangxia.com.utils.http.HttpUtil;
 import dangxia.com.utils.http.UrlHandler;

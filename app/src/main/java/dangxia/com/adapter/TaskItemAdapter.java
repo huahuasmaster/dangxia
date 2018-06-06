@@ -16,8 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dangxia.com.R;
 import dangxia.com.adapter.listener.TaskItemCallBackListener;
-import dangxia.com.entity.TaskDto;
-import dangxia.com.utils.http.UrlHandler;
+import dangxia.com.dto.TaskDto;
 import dangxia.com.utils.location.DistanceUtil;
 import dangxia.com.utils.location.LocationUtil;
 
@@ -106,7 +105,7 @@ public class TaskItemAdapter extends RecyclerView.Adapter {
         @BindView(R.id.whole_view)
         CardView wholeView;
 
-        public MyHolder(View itemView) {
+        MyHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(itemView);
             icon = itemView.findViewById(R.id.icon);

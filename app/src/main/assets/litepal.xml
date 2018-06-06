@@ -32,7 +32,8 @@
     	</list>
     -->
     <list>
-        <mapping class="dangxia.com.entity.MessageDto" />
+        <mapping class="dangxia.com.dto.MessageDto" />
+        <!--<mapping class="dangxia.com.entity.UserIcon"/>-->
     </list>
 
     <!--

@@ -1,26 +1,23 @@
 package dangxia.com.ui;
 
-import android.support.annotation.NonNull;
+import android.annotation.SuppressLint;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.gson.Gson;
 
-import java.net.URL;
 import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dangxia.com.R;
-import dangxia.com.entity.OrderDto;
+import dangxia.com.dto.OrderDto;
 import dangxia.com.utils.http.HttpCallbackListener;
 import dangxia.com.utils.http.HttpUtil;
 import dangxia.com.utils.http.UrlHandler;
@@ -76,7 +73,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         }
         confirmDialog = new MaterialDialog.Builder(this)
                 .title("确认需求已完成？")
-                .content("欠款将直接打入对方账户。")
+                .content("钱款将直接打入对方账户。")
                 .negativeText("取消")
                 .positiveText("确定")
                 .onPositive((dialog, which) -> {
@@ -88,13 +85,10 @@ public class OrderDetailActivity extends AppCompatActivity {
                         @Override
                         public void onFinish(String response) {
                             if (response.equals("1")) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Snackbar.make(fab, "交易成功！", Snackbar.LENGTH_SHORT).show();
-                                        fab.setEnabled(false);
-                                        title.setText("订单详情（已完成）");
-                                    }
+                                runOnUiThread(() -> {
+                                    Snackbar.make(fab, "交易成功！", Snackbar.LENGTH_SHORT).show();
+                                    fab.setEnabled(false);
+                                    title.setText("订单详情（已完成）");
                                 });
 
                             }
@@ -110,6 +104,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         waitDialog.show();
         String url = UrlHandler.getOrderByTask(taskId);
         HttpUtil.getInstance().get(url, new HttpCallbackListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onFinish(String response) {
                 orderDto = new Gson().fromJson(response, OrderDto.class);

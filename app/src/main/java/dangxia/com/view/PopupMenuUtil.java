@@ -33,8 +33,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import dangxia.com.R;
-import dangxia.com.entity.PriceSection;
-import dangxia.com.entity.TaskClassDto;
+import dangxia.com.dto.PriceSection;
+import dangxia.com.dto.TaskClassDto;
 import dangxia.com.ui.CommunityFragment;
 import dangxia.com.ui.LocChooseActivity;
 import dangxia.com.ui.QuickFragment;

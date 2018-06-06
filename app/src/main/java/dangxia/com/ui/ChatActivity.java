@@ -2,6 +2,7 @@ package dangxia.com.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,7 +27,11 @@ import com.lichfaker.log.Logger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.litepal.LitePal;
+import org.litepal.crud.DataSupport;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,9 +42,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dangxia.com.R;
 import dangxia.com.adapter.MsgChatItemAdapter;
-import dangxia.com.entity.ConversationDto;
-import dangxia.com.entity.MessageDto;
-import dangxia.com.entity.TaskDto;
+import dangxia.com.dto.ConversationDto;
+import dangxia.com.dto.MessageDto;
+import dangxia.com.dto.TaskDto;
 import dangxia.com.utils.http.HttpCallbackListener;
 import dangxia.com.utils.http.HttpUtil;
 import dangxia.com.utils.http.UrlHandler;
@@ -71,6 +76,11 @@ public class ChatActivity extends AppCompatActivity {
     TextView taskDetail;
 
     private MsgChatItemAdapter adapter;
+
+    private boolean isFirstRun = true;
+
+    @SuppressLint("SimpleDateFormat")
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @OnClick(R.id.task_detail)
     void onTaskDetailClick() {
@@ -254,26 +264,46 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void initMsgData() {
+        Date lastDate = null;
         if (adapter == null) {
             adapter = new MsgChatItemAdapter();
+            //先在本地数据库中查找
+//            List<MessageDto> local = DataSupport.findBySQL("select * from messagedto as msg where msg.conversation_id = "+mConversation.getId());
+            List<MessageDto> local = DataSupport.where("conversationId = ?", "" + mConversation.getId())
+                    .order("date").find(MessageDto.class);
+            if (local != null && local.size() > 0) {
+                msgList = local;
+                Log.i(TAG, "initMsgData: 本地数据有" + local.size());
+                try {
+                    lastDate = DATE_FORMAT.parse(local.get(local.size() - 1).getDate());
+                } catch (ParseException e) {
+                    lastDate = null;
+                }
+            } else {
+                Log.i(TAG, "initMsgData: 在本地数据库中没有数据");
+            }
             adapter.setMsgList(msgList);
             chatList.setAdapter(adapter);
             chatList.setItemAnimator(new DefaultItemAnimator());
             chatList.setLayoutManager(new LinearLayoutManager(this));
         }
-        HttpUtil.getInstance().get(UrlHandler.getMsgList(conId), new HttpCallbackListener() {
-            @Override
-            public void onFinish(String response) {
-                msgList = new Gson().fromJson(response, new TypeToken<List<MessageDto>>() {
-                }.getType());
-                if (msgList != null) {
-                    runOnUiThread(() -> {
-                        adapter.setMsgList(msgList);
-                        adapter.notifyDataSetChanged();
-                    });
-                }
-            }
-        });
+        HttpUtil.getInstance().get(lastDate == null ? UrlHandler.getMsgList(conId) : UrlHandler.getMsgList(conId, lastDate.getTime()),
+                new HttpCallbackListener() {
+                    @Override
+                    public void onFinish(String response) {
+                        msgList = new Gson().fromJson(response, new TypeToken<List<MessageDto>>() {
+                        }.getType());
+                        if (msgList != null) {
+                            //批量存入数据库
+                            Log.i(TAG, "onFinish: 从服务器获取的新数据有" + msgList.size());
+                            for (MessageDto dto : msgList) {
+                                dto.save();
+                                insertAndScroll(dto);
+                            }
+
+                        }
+                    }
+                });
     }
 
     private void sendMsg(String content) {
@@ -288,15 +318,33 @@ public class ChatActivity extends AppCompatActivity {
                 .add("type", "0")
                 .build();
         HttpUtil.getInstance().post(UrlHandler.pushMsg(conId), body,
-                null);
+                new HttpCallbackListener() {
+                    @Override
+                    public void onFinish(String response) {
+                        if (response.equals("1")) {
+                            messageDto.save();
+                        }
+                    }
+                });
         insertAndScroll(messageDto);
     }
 
+    /**
+     * 插入一条新消息并滚到底部
+     *
+     * @param messageDto
+     */
     private void insertAndScroll(MessageDto messageDto) {
-        adapter.getMsgList().add(messageDto);
-        adapter.notifyItemRangeChanged(adapter.getMsgList().size() - 2, 1);
-        adapter.notifyItemInserted(adapter.getMsgList().size() - 1);
-        scrollToBottom();
+        runOnUiThread(() -> {
+            adapter.getMsgList().add(messageDto);
+            if (messageDto.getType() == -1) {
+                return;
+            }
+            adapter.notifyItemRangeChanged(adapter.getMsgList().size() - 2, 1);
+            adapter.notifyItemInserted(adapter.getMsgList().size() - 1);
+            scrollToBottom();
+        });
+
     }
 
     private void checkEdit() {
@@ -370,6 +418,8 @@ public class ChatActivity extends AppCompatActivity {
         Log.i("chat", "onEvent: 监听到busevent" + messageDto.toString());
         //将消息反序列化为MessageDto
         runOnUiThread(() -> {
+            //在本地数据库中写入
+            messageDto.save();
             if (messageDto.getType() != -1) {
                 insertAndScroll(messageDto);
             } else if (messageDto.getContent().contains(MessageDto.PRICE_CHANGED)

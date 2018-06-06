@@ -10,9 +10,11 @@ import android.widget.TextView;
 import com.github.library.bubbleview.BubbleTextView;
 
 import java.util.List;
+import java.util.ListIterator;
 
 import dangxia.com.R;
-import dangxia.com.entity.MessageDto;
+import dangxia.com.dto.MessageDto;
+import dangxia.com.entity.Message;
 import dangxia.com.utils.http.UrlHandler;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -25,6 +27,12 @@ public class MsgChatItemAdapter extends RecyclerView.Adapter{
     }
 
     public void setMsgList(List<MessageDto> msgList) {
+        ListIterator<MessageDto> iterator = msgList.listIterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().getType() == -1) {
+                iterator.remove();
+            }
+        }
         this.msgList = msgList;
     }
 
@@ -37,6 +45,7 @@ public class MsgChatItemAdapter extends RecyclerView.Adapter{
                         .inflate(R.layout.item_chat_accept,parent,false);
                 return new MsgHolder(v);
             case 0:
+            case 3:
                 v = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.item_chat_send,parent,false);
                 return new MsgHolder(v);
@@ -47,9 +56,12 @@ public class MsgChatItemAdapter extends RecyclerView.Adapter{
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (holder == null) return;
         MsgHolder msgHolder = (MsgHolder)holder;
         MessageDto bean = msgList.get(position);
+        if (bean.getType() == -1) {
+            msgHolder.wholeView.setVisibility(View.GONE);
+            return;
+        }
         //填充信息内容
         msgHolder.contentTxt.setText(bean.getContent());
         //填充时间
@@ -83,10 +95,10 @@ public class MsgChatItemAdapter extends RecyclerView.Adapter{
         TextView dateTxt;
         BubbleTextView contentTxt;
         CircleImageView headerImg;
-
+        View wholeView;
         MsgHolder(View itemView) {
             super(itemView);
-
+            wholeView = itemView.findViewById(R.id.whole_view);
             dateTxt = itemView.findViewById(R.id.chat_item_date);
             contentTxt = itemView.findViewById(R.id.chat_item_content_image);
             headerImg = itemView.findViewById(R.id.chat_item_header);

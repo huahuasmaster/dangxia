@@ -26,7 +26,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dangxia.com.R;
-import dangxia.com.entity.TabEntity;
+import dangxia.com.dto.TabEntity;
 import dangxia.com.utils.location.LocationUtil;
 import dangxia.com.utils.mqtt.MqttManager;
 import dangxia.com.view.PopupMenuUtil;

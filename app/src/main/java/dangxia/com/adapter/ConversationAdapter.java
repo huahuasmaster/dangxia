@@ -13,7 +13,7 @@ import java.util.List;
 
 import dangxia.com.R;
 import dangxia.com.adapter.listener.SwipeItemCallbackListener;
-import dangxia.com.entity.ConversationDto;
+import dangxia.com.dto.ConversationDto;
 import dangxia.com.utils.http.UrlHandler;
 
 /**

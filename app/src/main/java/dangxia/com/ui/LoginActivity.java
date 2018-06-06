@@ -24,13 +24,15 @@ import com.google.gson.Gson;
 
 import org.litepal.tablemanager.Connector;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dangxia.com.R;
-import dangxia.com.entity.UserDto;
+import dangxia.com.dto.UserDto;
 import dangxia.com.utils.http.HttpCallbackListener;
 import dangxia.com.utils.http.HttpUtil;
 import dangxia.com.utils.http.UrlHandler;
@@ -54,6 +56,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private SharedPreferences loginSp;
     private MaterialDialog waitDialog;
+    @SuppressLint("SimpleDateFormat")
+    private DateFormat format = new SimpleDateFormat("yyyy-HH-dd HH:mm:ss");
+    private String TAG = "loginactivity";
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -71,6 +76,20 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, "创建数据库成功", Toast.LENGTH_SHORT).show();
             loginSp.edit().putBoolean("first", false).apply();
         }
+//        MessageDto messageDto = new MessageDto();
+//        messageDto.setContent("测试");
+//        messageDto.setDate(format.format(new Date()));
+//        messageDto.setId(1000);
+//        messageDto.setSender(2);
+//        messageDto.setSenderName("嘻嘻嘻");
+//        messageDto.setStatus(0);
+//        messageDto.setType(0);
+//        messageDto.save();
+//        Toast.makeText(this, "添加测试数据", Toast.LENGTH_SHORT).show();
+//        List<MessageDto> dtos = DataSupport.findAll(MessageDto.class);
+//        for(MessageDto dto : dtos) {
+//            Log.i(TAG, "onCreate: "+dto.toString());
+//        }
         waitDialog = new MaterialDialog.Builder(this)
                 .title("登录中……")
                 .content("请稍后")
@@ -185,5 +204,10 @@ public class LoginActivity extends AppCompatActivity {
                 break;
             default:
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 }

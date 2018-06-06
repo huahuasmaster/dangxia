@@ -1,4 +1,4 @@
-package dangxia.com.entity;
+package dangxia.com.dto;
 
 import com.flyco.tablayout.listener.CustomTabEntity;
 

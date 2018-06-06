@@ -1,4 +1,4 @@
-package dangxia.com.entity;
+package dangxia.com.dto;
 
 public class OrderDto {
     private int id;

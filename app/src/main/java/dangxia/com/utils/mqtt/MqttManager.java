@@ -1,14 +1,7 @@
 package dangxia.com.utils.mqtt;
 
-import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import com.google.gson.Gson;
 import com.lichfaker.log.Logger;
@@ -21,14 +14,8 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.greenrobot.eventbus.EventBus;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
-import dangxia.com.R;
 import dangxia.com.application.ContextApplication;
-import dangxia.com.entity.MessageDto;
-import dangxia.com.ui.MainActivity;
+import dangxia.com.dto.MessageDto;
 
 /**
  * 管理mqtt的连接,发布,订阅,断开连接, 断开重连等操作

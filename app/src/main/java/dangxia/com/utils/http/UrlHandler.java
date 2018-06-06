@@ -99,6 +99,11 @@ public class UrlHandler {
         return getHead() + "/conversation/" + conId + "/msglist";
     }
 
+    //获取会话中的聊天记录
+    public static String getMsgList(int conId, long beginDate) {
+        return getHead() + "/conversation/" + conId + "/msgListByDate?beginDate=" + beginDate;
+    }
+
     //获取任务当前的价格
     public static String getCurrentPrice(int id) {
         return getHead() + "/task/" + id + "/price";

@@ -28,7 +28,7 @@ import java.util.Objects;
 import dangxia.com.R;
 import dangxia.com.adapter.TaskItemAdapter;
 import dangxia.com.adapter.listener.TaskItemCallBackListener;
-import dangxia.com.entity.TaskDto;
+import dangxia.com.dto.TaskDto;
 import dangxia.com.utils.http.HttpCallbackListener;
 import dangxia.com.utils.http.HttpUtil;
 import dangxia.com.utils.http.UrlHandler;
@@ -164,11 +164,9 @@ public class CommunityFragment extends Fragment {
                         myTaskRV.setAdapter(myTaskAdapter);
                     }
                     if (myTask == null) {
-                        getActivity().runOnUiThread(() -> {
                             if (swipeAllTask.isRefreshing()) {
                                 swipeAllTask.setRefreshing(false);
                             }
-                        });
                         return;
                     }
                     myTaskAdapter.setTaskDtos(myTask);

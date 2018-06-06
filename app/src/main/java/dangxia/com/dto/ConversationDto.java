@@ -1,4 +1,4 @@
-package dangxia.com.entity;
+package dangxia.com.dto;
 
 import java.io.Serializable;
 

@@ -2,19 +2,14 @@ package dangxia.com.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.baidu.location.LocationClient;
 import com.baidu.mapapi.map.BaiduMap;
@@ -30,15 +25,12 @@ import com.baidu.mapapi.model.LatLng;
 import com.github.library.bubbleview.BubbleTextView;
 import com.google.gson.Gson;
 
-import java.net.URL;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dangxia.com.R;
-import dangxia.com.adapter.MsgChatItemAdapter;
-import dangxia.com.entity.ConversationDto;
-import dangxia.com.entity.TaskDto;
+import dangxia.com.dto.ConversationDto;
+import dangxia.com.dto.TaskDto;
 import dangxia.com.utils.http.HttpCallbackListener;
 import dangxia.com.utils.http.HttpUtil;
 import dangxia.com.utils.http.UrlHandler;

@@ -23,7 +23,6 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
-import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.Marker;
@@ -41,11 +40,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import dangxia.com.R;
-import dangxia.com.entity.TaskDto;
+import dangxia.com.dto.TaskDto;
 import dangxia.com.utils.http.HttpCallbackListener;
 import dangxia.com.utils.http.HttpUtil;
 import dangxia.com.utils.http.UrlHandler;
@@ -83,6 +80,7 @@ public class QuickFragment extends Fragment {
 
     private CardView bottomLabel;
     private ImageView closeBtn;
+    private boolean ready = false;
 
     public QuickFragment() {
     }
@@ -112,6 +110,7 @@ public class QuickFragment extends Fragment {
         mLocationClient.registerLocationListener(new MyLocationListener());
         mLocationClient.start();
         setLocationRefresh();
+        ready = true;
         initLables();
         baiduMap.setOnMarkerClickListener(marker -> {
             final TaskDto taskBean = map.get(marker);
@@ -161,7 +160,6 @@ public class QuickFragment extends Fragment {
         mLocationClient.start();
         setLocationRefresh();
         navigateTo(LocationUtil.getInstance().getLatitude(), LocationUtil.getInstance().getLongitude());
-
         initLables();
 
     }
@@ -169,7 +167,10 @@ public class QuickFragment extends Fragment {
     /**
      * 请求网络数据，更新标签
      */
-    private void initLables() {
+    public void initLables() {
+        if (!ready) {
+            return;
+        }
         baiduMap.clear();
         HttpUtil.getInstance().get(UrlHandler.getQuickTask(LocationUtil.getInstance().getLatitude(),
                 LocationUtil.getInstance().getLongitude(), 10), new HttpCallbackListener() {

@@ -17,7 +17,7 @@ import butterknife.ButterKnife;
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
 import dangxia.com.R;
-import dangxia.com.entity.UserDto;
+import dangxia.com.dto.UserDto;
 import dangxia.com.utils.http.HttpCallbackListener;
 import dangxia.com.utils.http.HttpUtil;
 import dangxia.com.utils.http.UrlHandler;

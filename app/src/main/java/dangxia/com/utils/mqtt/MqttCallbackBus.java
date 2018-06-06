@@ -1,15 +1,11 @@
 package dangxia.com.utils.mqtt;
 
 
-import com.google.gson.Gson;
 import com.lichfaker.log.Logger;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.greenrobot.eventbus.EventBus;
-
-import dangxia.com.entity.MessageDto;
 
 /**
  * 使用EventBus分发事件
