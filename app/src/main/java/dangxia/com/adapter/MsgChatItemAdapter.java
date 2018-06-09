@@ -14,7 +14,6 @@ import java.util.ListIterator;
 
 import dangxia.com.R;
 import dangxia.com.dto.MessageDto;
-import dangxia.com.entity.Message;
 import dangxia.com.utils.http.UrlHandler;
 import de.hdodenhof.circleimageview.CircleImageView;
 
