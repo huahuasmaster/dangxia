@@ -269,8 +269,8 @@ public class ChatActivity extends AppCompatActivity {
             adapter = new MsgChatItemAdapter();
             //先在本地数据库中查找
 //            List<MessageDto> local = DataSupport.findBySQL("select * from messagedto as msg where msg.conversation_id = "+mConversation.getId());
-            List<MessageDto> local = DataSupport.where("conversationId = ?", "" + mConversation.getId())
-                    .order("date").find(MessageDto.class);
+            List<MessageDto> local = DataSupport.where("conversationId = ?",
+                    "" + mConversation.getId()).order("date").find(MessageDto.class);
             if (local != null && local.size() > 0) {
                 msgList = local;
                 Log.i(TAG, "initMsgData: 本地数据有" + local.size());
@@ -279,15 +279,14 @@ public class ChatActivity extends AppCompatActivity {
                 } catch (ParseException e) {
                     lastDate = null;
                 }
-            } else {
-                Log.i(TAG, "initMsgData: 在本地数据库中没有数据");
-            }
+            } else { Log.i(TAG, "initMsgData: 在本地数据库中没有数据"); }
             adapter.setMsgList(msgList);
             chatList.setAdapter(adapter);
             chatList.setItemAnimator(new DefaultItemAnimator());
             chatList.setLayoutManager(new LinearLayoutManager(this));
         }
-        HttpUtil.getInstance().get(lastDate == null ? UrlHandler.getMsgList(conId) : UrlHandler.getMsgList(conId, lastDate.getTime()),
+        HttpUtil.getInstance().get(lastDate == null ?
+                        UrlHandler.getMsgList(conId) : UrlHandler.getMsgList(conId, lastDate.getTime()),
                 new HttpCallbackListener() {
                     @Override
                     public void onFinish(String response) {
@@ -300,7 +299,6 @@ public class ChatActivity extends AppCompatActivity {
                                 dto.save();
                                 insertAndScroll(dto);
                             }
-
                         }
                     }
                 });

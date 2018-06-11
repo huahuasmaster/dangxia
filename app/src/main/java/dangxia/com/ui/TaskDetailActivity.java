@@ -59,7 +59,8 @@ public class TaskDetailActivity extends AppCompatActivity {
     @OnClick(R.id.navigate_task_detail)
     void goNavigate() {
         Intent naviIntent = new Intent("android.intent.action.VIEW",
-                android.net.Uri.parse("baidumap://map/geocoder?location=" + mTask.getLatitude() + "," + mTask.getLongitude()));
+                android.net.Uri.parse("baidumap://map/geocoder?location=" + mTask.getLatitude()
+                        + "," + mTask.getLongitude()));
         startActivity(naviIntent);
     }
 

@@ -67,19 +67,23 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 if (data instanceof Throwable) {
                     Throwable throwable = (Throwable) data;
                     final String msg = throwable.getMessage();
-                    runOnUiThread(() -> Toast.makeText(RegisterActivity.this, msg, Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() ->
+                            Toast.makeText(RegisterActivity.this, msg, Toast.LENGTH_SHORT).show());
                 } else {
                     if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
                         // 这里是验证成功的回调，可以处理验证成功后您自己的逻辑，需要注意的是这里不是主线程
                         Log.i("1234", "获取成功！");
-                        runOnUiThread(() -> Toast.makeText(RegisterActivity.this, "发送成功！", Toast.LENGTH_SHORT).show());
+                        runOnUiThread(() -> Toast.makeText(RegisterActivity.this, "发送成功！",
+                                Toast.LENGTH_SHORT).show());
                     } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                         Log.i("1234", "验证成功！");
                         final String phone = phoneEdit.getText().toString().trim();
                         final String password = pwdEdit.getText().toString().trim();
                         RegisterActivity.this.getSharedPreferences("login_data", Context.MODE_PRIVATE)
                                 .edit().putString("phone", phone).apply();
-                        runOnUiThread(() -> Toast.makeText(RegisterActivity.this, "验证成功！注册中", Toast.LENGTH_SHORT).show());
+                        runOnUiThread(() ->
+                                Toast.makeText(RegisterActivity.this, "验证成功！注册中", Toast.LENGTH_SHORT)
+                                        .show());
                         String url = UrlHandler.getRegisterUrl();
                         RequestBody body = new FormBody.Builder()
                                 .add("phone", phone)

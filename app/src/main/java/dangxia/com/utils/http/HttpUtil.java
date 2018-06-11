@@ -40,7 +40,8 @@ public class HttpUtil {
         return httpUtil;
     }
 
-    public void sendRequestWithCallback(final RequestTypeEnum method, final String address, final RequestBody body, final HttpCallbackListener listener
+    public void sendRequestWithCallback(final RequestTypeEnum method, final String address,
+                                        final RequestBody body, final HttpCallbackListener listener
     ) {
         new Thread(() -> {
             Request.Builder builder = new Request.Builder()

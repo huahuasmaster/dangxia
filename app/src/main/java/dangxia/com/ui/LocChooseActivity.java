@@ -106,15 +106,14 @@ public class LocChooseActivity extends AppCompatActivity {
         //添加一个可拖动的marker
         BitmapDescriptor bdGround = BitmapDescriptorFactory
                 .fromResource(R.drawable.icon_gcoding);
-        MarkerOptions options = new MarkerOptions().position(ll).icon(bdGround).draggable(true);
+        MarkerOptions options =
+                new MarkerOptions().position(ll).icon(bdGround).draggable(true);
         options.animateType(MarkerOptions.MarkerAnimateType.drop);
         final Marker mMarker = (Marker) baiduMap.addOverlay(options);
         Log.i(TAG, "navigateTo: 添加marker成功");
         baiduMap.setOnMarkerDragListener(new BaiduMap.OnMarkerDragListener() {
             @Override
-            public void onMarkerDrag(Marker marker) {
-
-            }
+            public void onMarkerDrag(Marker marker) {}
 
             @Override
             public void onMarkerDragEnd(Marker marker) {
@@ -129,9 +128,7 @@ public class LocChooseActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onMarkerDragStart(Marker marker) {
-
-            }
+            public void onMarkerDragStart(Marker marker) {}
         });
 
         final Snackbar snackbar = Snackbar.make(mapView, "按住并拖拽小红点以选取任务执行地点",
